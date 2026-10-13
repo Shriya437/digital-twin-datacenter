@@ -1,5 +1,13 @@
-.venv/
+
+@"
 __pycache__/
 *.py[cod]
-outputs/*
-!outputs/.gitkeep
+.venv/
+env/
+data/
+*.tar
+*.parquet
+*.joblib
+member1_outputs/
+shared_drive/
+"@ | Out-File -FilePath .gitignore -Encoding utf8
