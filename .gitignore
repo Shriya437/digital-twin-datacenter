@@ -1,7 +1,17 @@
-.venv/
 __pycache__/
 *.py[cod]
+.venv/
+env/
+aimlmini/
+scratch/
+
+# Outputs
 outputs/*
 !outputs/.gitkeep
-scratch/
-aimlmini/
+member1_outputs/
+shared_drive/
+
+# Artifacts
+*.tar
+*.parquet
+*.joblib
