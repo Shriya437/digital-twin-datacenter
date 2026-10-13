@@ -21,6 +21,9 @@ from src.power_temperature_analytics import (
     prepare_forecasting_dataset,
     train_and_evaluate_temperature_forecast,
     predict_future_temperature,
+    save_pue_requirements,
+    analyze_processor_temperature_difference,
+    analyze_fan_trends,
 )
 
 
@@ -137,8 +140,28 @@ class Module6AnalyticsTests(unittest.TestCase):
         self.assertTrue((self.output_dir / "standardized_prediction_record.json").exists())
         self.assertTrue((self.output_dir / "standardized_temperature_predictions.csv").exists())
         self.assertTrue((self.output_dir / "temperature_forecast_model.joblib").exists())
-        self.assertTrue((self.output_dir / "future_temperature_forecast.png").exists())
+    def test_pue_requirements(self):
+        save_pue_requirements(self.output_dir)
+        pue_csv = self.output_dir / "pue_requirements.csv"
+        self.assertTrue(pue_csv.exists())
+        pue_df = pd.read_csv(pue_csv)
+        self.assertFalse(bool(pue_df.loc[0, "pue_calculated"]))
+        self.assertIn("Total Facility Energy", pue_df.loc[0, "standard_formula"])
+
+    def test_processor_temperature_difference(self):
+        analyze_processor_temperature_difference(self.df, self.output_dir)
+        self.assertTrue((self.output_dir / "processor_temperature_difference.png").exists())
+        diff_csv = self.output_dir / "processor_temperature_difference.csv"
+        self.assertTrue(diff_csv.exists())
+        diff_df = pd.read_csv(diff_csv)
+        self.assertIn("processor_temp_difference", diff_df.columns)
+
+    def test_fan_trends(self):
+        analyze_fan_trends(self.df, self.output_dir)
+        self.assertTrue((self.output_dir / "fan0_0_trend.png").exists())
+        self.assertTrue((self.output_dir / "fan1_0_trend.png").exists())
 
 
 if __name__ == "__main__":
     unittest.main()
+

@@ -462,6 +462,65 @@ def run_energy_cooling_analytics():
             )
             plt.close()
 
+    # ---------------- STEP 8.2: PUE SAFEGUARD ----------------
+    pue_report = pd.DataFrame([{
+        "pue_calculated": False,
+        "reason": (
+            "A single-node telemetry CSV does not by itself "
+            "establish total facility energy and complete IT "
+            "equipment energy over comparable intervals."
+        ),
+        "required_facility_energy": "Total facility energy over reporting interval (kWh)",
+        "required_it_energy": "IT equipment energy over the same reporting interval (kWh)",
+        "formula": "PUE = Total facility energy / IT equipment energy",
+        "scope_guidance": "Do not report a PUE value from total_power alone."
+    }])
+    pue_report.to_csv(OUTPUT_DIR / "pue_requirements.csv", index=False)
+    print("\nPUE requirements saved: do not claim PUE without facility-wide measurements.")
+
+    # ---------------- STEP 9.1: THERMAL-DIFFERENCE INDICATOR ----------------
+    if {"p0_vdd_temp", "p1_vdd_temp"}.issubset(df.columns):
+        df["processor_temp_difference"] = (
+            df["p0_vdd_temp"] - df["p1_vdd_temp"]
+        )
+
+        plt.figure(figsize=(12, 4))
+        plt.plot(
+            df["timestamp"],
+            df["processor_temp_difference"]
+        )
+
+        plt.xlabel("Timestamp")
+        plt.ylabel("Temperature difference (unit to verify)")
+        plt.title("Difference Between Processor Temperature Metrics")
+        plt.tight_layout()
+
+        plt.savefig(
+            OUTPUT_DIR / "processor_temperature_difference.png",
+            dpi=180
+        )
+        plt.close()
+        print("Saved processor_temperature_difference.png")
+
+    # ---------------- STEP 9.2: FAN-RELATED READINGS ----------------
+    for metric in ["fan0_0", "fan1_0"]:
+        if metric not in df.columns:
+            continue
+
+        plt.figure(figsize=(12, 4))
+        plt.plot(df["timestamp"], df[metric])
+        plt.xlabel("Timestamp")
+        plt.ylabel(f"{metric} (unit to verify)")
+        plt.title(f"Fan-Related Telemetry: {metric}")
+        plt.tight_layout()
+
+        plt.savefig(
+            OUTPUT_DIR / f"{metric}_trend.png",
+            dpi=180
+        )
+        plt.close()
+        print(f"Saved {metric}_trend.png")
+
     print("\nEnergy and cooling analytics completed.")
 
 
