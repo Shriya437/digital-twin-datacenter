@@ -1,13 +1,17 @@
-
-@"
 __pycache__/
 *.py[cod]
 .venv/
 env/
-data/
+aimlmini/
+scratch/
+
+# Outputs
+outputs/*
+!outputs/.gitkeep
+member1_outputs/
+shared_drive/
+
+# Artifacts
 *.tar
 *.parquet
 *.joblib
-member1_outputs/
-shared_drive/
-"@ | Out-File -FilePath .gitignore -Encoding utf8
