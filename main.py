@@ -8,7 +8,9 @@ from config import (
     OUTPUT_DIR,
     EXPECTED_FILES,
     METRICS,
-    DELAY_PATH
+    DELAY_PATH,
+    DATA_PATH,
+    MODEL_PATH
 )
 from prepare_dataset import run_preparation_pipeline
 from telemetry_reliability import compute_telemetry_reliability
@@ -16,6 +18,8 @@ from plausibility_validation import evaluate_plausibility
 from delay_staleness import run_delay_staleness_analysis
 from state_estimation import run_state_estimation_pipeline
 from drive_copy import copy_artifacts_to_shared_drive
+from stream_simulator import TelemetryStreamEngine
+from verify_performance import run_verification
 
 def validate_contract_outputs():
     validation_results = []
@@ -140,7 +144,14 @@ def main():
     print("\n=== Step 6: Artifact Validation & Integrity Checks ===")
     validate_contract_outputs()
 
-    print("\n=== Step 7: Local / Shared Copy ===")
+    print("\n=== Step 7: Real-time Telemetry Stream Ingestion ===")
+    streamer = TelemetryStreamEngine(DATA_PATH, MODEL_PATH)
+    streamer.run_stream()
+
+    print("\n=== Step 8: Final Performance Verification ===")
+    run_verification()
+
+    print("\n=== Step 9: Local / Shared Copy ===")
     copy_artifacts_to_shared_drive()
 
 if __name__ == "__main__":

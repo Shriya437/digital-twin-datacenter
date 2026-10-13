@@ -110,3 +110,8 @@ EXPECTED_FILES = {
         "stale_records"
     ]
 }
+
+# Streaming & Real-time Integration Config
+STREAMING_LOG_PATH = OUTPUT_DIR / "realtime_telemetry_stream_log.csv"
+STREAM_PLAYBACK_SPEED = 50.0  # Speed multiplier for replaying timestamps (e.g., 50x faster than real-time)
+MAX_STREAM_EVENTS = 100       # Number of events to process in a demo run
