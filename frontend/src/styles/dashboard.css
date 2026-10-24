@@ -1,0 +1,366 @@
+/* ==========================================================================
+   DASHBOARD ARCHITECTURAL LAYOUT & VIEWPORT SYSTEM
+   ========================================================================== */
+
+/* App Frame Shell */
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Ambient Radial Mesh Background Glow */
+.app-container::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: 10%;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.06) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-container::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  right: 5%;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Main Viewport Column */
+.app-main-viewport {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+/* Scrollable View Content Workspace */
+.dashboard-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: transparent;
+  scroll-behavior: smooth;
+}
+
+/* Fullscreen Twin Workspace Override */
+.dashboard-content.twin-active {
+  padding: 12px;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   RESPONSIVE METRIC & COMPONENT GRIDS
+   ========================================================================== */
+
+/* Auto-fit Metric Grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+/* Dual Column Layout (Tables, Graphs & Diagnostics) */
+.dashboard-dual-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+/* Triple Column Diagnostic Split */
+.dashboard-triple-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+/* ==========================================================================
+   HEADER & TOP HUD UTILITIES
+   ========================================================================== */
+.dashboard-header {
+  height: 64px;
+  padding: 0 24px;
+  background: rgba(11, 19, 43, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justifyContent: space-between;
+  align-items: center;
+  z-index: 20;
+}
+
+.dashboard-header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dashboard-header-title h1 {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.dashboard-header-status {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Section Header Bar */
+.section-header {
+  display: flex;
+  justifyContent: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.section-header p {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   NAVIGATION SIDEBAR STYLING
+   ========================================================================== */
+.sidebar-container {
+  width: 250px;
+  height: 100%;
+  background: rgba(7, 13, 30, 0.95);
+  backdrop-filter: blur(16px);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  z-index: 25;
+}
+
+.sidebar-logo-area {
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 12px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: all var(--transition-fast);
+  text-align: left;
+  width: 100%;
+}
+
+.sidebar-nav-item:hover {
+  color: var(--color-cyan);
+  background: rgba(14, 165, 233, 0.08);
+  border-color: rgba(56, 189, 248, 0.2);
+  transform: translateX(3px);
+}
+
+.sidebar-nav-item.active {
+  color: #ffffff;
+  background: linear-gradient(90deg, rgba(14, 165, 233, 0.25) 0%, rgba(139, 92, 246, 0.15) 100%);
+  border-color: var(--color-cyan);
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.2), inset 0 0 10px rgba(0, 242, 254, 0.1);
+}
+
+.sidebar-nav-item.active .nav-icon {
+  color: var(--color-cyan);
+  text-shadow: 0 0 8px var(--color-cyan);
+}
+
+/* ==========================================================================
+   METRIC CARDS & DATA WIDGETS
+   ========================================================================== */
+.metric-card-container {
+  background: var(--gradient-card);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justifyContent: space-between;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-smooth);
+}
+
+.metric-card-container:hover {
+  background: var(--gradient-card-hover);
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-lg), var(--shadow-neon-cyan);
+  transform: translateY(-2px);
+}
+
+.metric-card-header {
+  display: flex;
+  justifyContent: space-between;
+  align-items: flex-start;
+}
+
+.metric-card-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.metric-card-body {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.metric-card-value {
+  font-size: 26px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.metric-card-unit {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.metric-card-footer {
+  display: flex;
+  justifyContent: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: var(--text-muted);
+  border-top: 1px solid rgba(51, 65, 85, 0.4);
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+   DATA TABLES (TELEMETRY & ANOMALIES)
+   ========================================================================== */
+.data-table-container {
+  background: var(--gradient-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.data-table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+}
+
+.data-table th {
+  padding: 10px 14px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.35);
+  color: #cbd5e1;
+  white-space: nowrap;
+  transition: background var(--transition-fast);
+}
+
+.data-table tbody tr:hover td {
+  background: rgba(14, 165, 233, 0.08);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1024px) {
+  .dashboard-dual-grid {
+    grid-template-columns: 1fr;
+  }
+  .sidebar-container {
+    width: 70px;
+  }
+  .sidebar-container .sidebar-text {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-content {
+    padding: 14px;
+    gap: 16px;
+  }
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}

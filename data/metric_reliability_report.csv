@@ -1,0 +1,11 @@
+metric_name,record_count,completeness_pct,finite_value_pct,timestamp_coverage_pct,missing_count,non_finite_count,duplicate_timestamp_count,timestamp_gap_count,plausibility_status,plausibility_score_pct,data_quality_score_pct,data_quality_status,score_is_heuristic,actual_arrival_delay_available
+ambient,4917,100.0,100.0,91.662,0,0,0,410,not_checked_units_unverified,,97.498,moderate_data_quality,True,False
+p0_vdd_temp,4917,100.0,100.0,91.662,0,0,0,410,not_checked_units_unverified,,97.498,moderate_data_quality,True,False
+p1_vdd_temp,4917,100.0,100.0,91.662,0,0,0,410,not_checked_units_unverified,,97.498,moderate_data_quality,True,False
+fan0_0,4917,100.0,100.0,91.662,0,0,0,410,not_checked_units_unverified,,97.498,moderate_data_quality,True,False
+fan1_0,4917,100.0,100.0,91.662,0,0,0,410,not_checked_units_unverified,,97.498,moderate_data_quality,True,False
+p0_power,4917,100.0,100.0,91.662,0,0,0,410,not_checked_units_unverified,,97.498,moderate_data_quality,True,False
+p1_power,4917,100.0,100.0,91.662,0,0,0,410,not_checked_units_unverified,,97.498,moderate_data_quality,True,False
+ps0_input_power,4917,100.0,100.0,91.662,0,0,0,410,not_checked_units_unverified,,97.498,moderate_data_quality,True,False
+ps1_input_power,4917,100.0,100.0,91.662,0,0,0,410,not_checked_units_unverified,,97.498,moderate_data_quality,True,False
+total_power,4917,100.0,100.0,91.662,0,0,0,410,not_checked_units_unverified,,97.498,moderate_data_quality,True,False
