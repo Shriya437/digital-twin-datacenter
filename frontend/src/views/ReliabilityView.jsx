@@ -102,7 +102,7 @@ export default function ReliabilityView() {
           Telemetry Reliability & Dataset Quality Analysis
         </h2>
         <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
-          Monitors sensor stream completeness, timestamp cadence, and empirical data integrity[cite: 1].
+          Monitors sensor stream completeness, timestamp cadence, and empirical data integrity.
         </p>
       </div>
 
@@ -236,19 +236,19 @@ export default function ReliabilityView() {
           <div style={{ background: 'rgba(30, 41, 59, 0.45)', borderRadius: '8px', padding: '12px', fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div style={{ color: '#38bdf8', fontWeight: 600 }}>Cadence Audit Policy</div>
             <p style={{ margin: 0, color: '#cbd5e1', lineHeight: 1.5 }}>
-              Observations are audited against the expected 5-minute sampling interval from Marconi-100[cite: 1]. Missing gaps trigger immediate pipeline logging rather than silent linear interpolation[cite: 1].
+              Observations are audited against the expected 5-minute sampling interval from Marconi-100. Missing gaps trigger immediate pipeline logging rather than silent linear interpolation.
             </p>
           </div>
 
           <div style={{ background: 'rgba(30, 41, 59, 0.45)', borderRadius: '8px', padding: '12px', fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div style={{ color: '#fbbf24', fontWeight: 600 }}>Zero False Reliability Equivalence</div>
             <p style={{ margin: 0, color: '#cbd5e1', lineHeight: 1.5 }}>
-              The UI does not convert an anomaly detection score into a component failure probability[cite: 1]. Unsupervised models detect out-of-distribution observations, not guaranteed physical breakdown[cite: 1].
+              The UI does not convert an anomaly detection score into a component failure probability. Unsupervised models detect out-of-distribution observations, not guaranteed physical breakdown.
             </p>
           </div>
 
           <div style={{ fontSize: '11px', color: '#64748b', fontStyle: 'italic', marginTop: 'auto' }}>
-            Audit reports generated from <code>metric_reliability_report.csv</code> & <code>timestamp_gap_report.csv</code>[cite: 1].
+            Audit reports generated from <code>metric_reliability_report.csv</code> & <code>timestamp_gap_report.csv</code>.
           </div>
         </div>
       </div>

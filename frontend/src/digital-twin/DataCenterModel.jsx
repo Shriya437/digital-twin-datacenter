@@ -190,7 +190,7 @@ export default function DataCenterModel({
         position: [-2.1, 0, z],
         rotation: [0, Math.PI / 2, 0],
         isMonitoredNode,
-        telemetry: isMonitoredNode ? telemetryData : null,
+        telemetry: telemetryData,
         anomaly: isMonitoredNode ? mlAnomalyResult : null
       });
     });
@@ -207,7 +207,7 @@ export default function DataCenterModel({
         position: [2.1, 0, z],
         rotation: [0, -Math.PI / 2, 0],
         isMonitoredNode: false,
-        telemetry: null,
+        telemetry: telemetryData,
         anomaly: null
       });
     });

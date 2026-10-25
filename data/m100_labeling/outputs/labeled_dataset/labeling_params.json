@@ -1,0 +1,151 @@
+{
+  "seed": 42,
+  "window": 15,
+  "warmup_rows": 14,
+  "persistence": 3,
+  "horizon_samples": 15,
+  "gap_threshold_seconds": 60.0,
+  "purge_rows": 30,
+  "split_fractions": [
+    0.6,
+    0.2
+  ],
+  "hard_quantile": 0.995,
+  "soft_quantile": 0.98,
+  "hard_min": 4.0,
+  "soft_min": 3.0,
+  "channels": {
+    "z_temp_p0": {
+      "target": "p0_vdd_temp",
+      "preds": [
+        "cpu_power_ewma8",
+        "cpu_power_ewma3",
+        "ambient"
+      ],
+      "median_res": -0.026,
+      "mad": 0.2672,
+      "quant_step": 1.0,
+      "scale": 1.0,
+      "hard": 4.0,
+      "soft": 3.0,
+      "n_fit": 2908
+    },
+    "z_temp_p1": {
+      "target": "p1_vdd_temp",
+      "preds": [
+        "cpu_power_ewma8",
+        "cpu_power_ewma3",
+        "ambient"
+      ],
+      "median_res": -0.0578,
+      "mad": 0.4349,
+      "quant_step": 1.0,
+      "scale": 1.0,
+      "hard": 4.0,
+      "soft": 3.0,
+      "n_fit": 2908
+    },
+    "z_temp_gradient": {
+      "target": "temp_gradient",
+      "preds": [
+        "cpu_power_ewma8"
+      ],
+      "median_res": 0.0001,
+      "mad": 0.0001,
+      "quant_step": 1.0,
+      "scale": 1.0,
+      "hard": 4.0,
+      "soft": 3.0,
+      "n_fit": 2908
+    },
+    "z_fan_level": {
+      "target": "fan_mean",
+      "preds": [
+        "temp_max",
+        "cpu_power_ewma8"
+      ],
+      "median_res": -0.01,
+      "mad": 71.3716,
+      "quant_step": 50.0,
+      "scale": 71.3716,
+      "hard": 28.7348,
+      "soft": 24.5314,
+      "n_fit": 2908
+    },
+    "z_fan_mismatch": {
+      "target": "fan_mismatch_ratio",
+      "preds": null,
+      "median_res": 0.0,
+      "mad": 0.0107,
+      "quant_step": 0.0227,
+      "scale": 0.0227,
+      "hard": 4.0,
+      "soft": 3.0,
+      "n_fit": 2908
+    },
+    "z_ps_total": {
+      "target": "ps_input_sum",
+      "preds": [
+        "cpu_power_sum",
+        "cpu_power_ewma3"
+      ],
+      "median_res": 1.4491,
+      "mad": 14.826,
+      "quant_step": 10.0,
+      "scale": 14.826,
+      "hard": 45.2399,
+      "soft": 42.8644,
+      "n_fit": 2908
+    },
+    "z_ps_balance": {
+      "target": "ps_balance",
+      "preds": [
+        "ps_input_sum"
+      ],
+      "median_res": 3.4331,
+      "mad": 14.6088,
+      "quant_step": 10.0,
+      "scale": 14.6088,
+      "hard": 20.3491,
+      "soft": 9.0247,
+      "n_fit": 2908
+    }
+  },
+  "families": {
+    "thermal": [
+      "z_temp_p0",
+      "z_temp_p1",
+      "z_temp_gradient"
+    ],
+    "fan": [
+      "z_fan_level",
+      "z_fan_mismatch"
+    ],
+    "power": [
+      "z_ps_total",
+      "z_ps_balance"
+    ]
+  },
+  "simulation": {
+    "thermal_hard_C": 4.0,
+    "total_vs_ps_slope": 0.9344,
+    "idle_cpu_power": 62.0,
+    "cpu_power_range": 188.0,
+    "window_len": 180,
+    "stride": 60,
+    "n_per_kind": {
+      "train": 10,
+      "val": 4,
+      "test": 4
+    },
+    "assumptions": {
+      "thermal": "p0 temp offset A=k*hard_threshold_C, k~U(0.75,2.5); p1 gets 0.8*A (shared cooling, p0/p1 corr 0.99 in data); offset passes a first-order lag (EWMA span 6) to mimic thermal inertia; rounded to 1 C (sensor resolution).",
+      "fan": "fan speed multiplied by (1 - m*d), d~U(0.10,0.30); either fan0 only or both fans (50/50); rounded to 100 (sensor resolution). Synthetic fan speed may fall below the observed idle floor (4200) because a degraded fan is by definition out-of-envelope.",
+      "fan_thermal_coupling": "ASSUMPTION (not verified): reduced airflow raises both processor temperatures by 20 C * m*d * load_fraction (load_fraction in [0,1] from causal CPU-power EWMA); same thermal lag.",
+      "power": "ps0_input_power multiplied by (1 + m*a), a~U(0.10,0.40), p0/p1 power untouched (input power not explained by CPU power); total_power shifted by the same absolute delta times the data-derived slope of total_power on ps0+ps1 (=0.9344); rounded to 10 (resolution).",
+      "profiles": "gradual (linear ramp 30-70 samples, p=0.7) or abrupt (3-sample ramp, p=0.3); hold; recovery with p=0.5 (20-40 samples) else persists to window end; power 'spike' variant uses abrupt ramp, hold 8-20, recovery 3.",
+      "combined": "two distinct components out of {thermal, fan, power}, onsets differ by 0-20 samples.",
+      "labels": "synthetic_label = 1 iff injected intensity m >= 0.20; severity stage 0:<0.2, 1:0.2-0.5, 2:0.5-0.9, 3:>=0.9 (abrupt faults jump to 3). Stage is injected-effect intensity, NOT time-to-failure or RUL."
+    }
+  }
+}

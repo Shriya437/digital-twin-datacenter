@@ -21,6 +21,12 @@ export default function App() {
   const [activeView, setActiveView] = useState('overview');
   const [backendConnected, setBackendConnected] = useState(false);
 
+  const [datasetMeta, setDatasetMeta] = useState({
+    activeDataset: 'm100_node1_digital_twin.csv',
+    totalRecords: 4917,
+    latestTimestamp: '—'
+  });
+
   // Selected asset for 3D inspection and side-panel details
   const [selectedAsset, setSelectedAsset] = useState(null);
 
@@ -30,15 +36,26 @@ export default function App() {
 
     async function checkHealth() {
       try {
-        await apiClient.get('/data/latest', { params: { node_id: 'node1' } });
-        if (isMounted) setBackendConnected(true);
+        const res = await apiClient.get('/data/latest', { params: { node_id: 'node1' } });
+        if (isMounted) {
+          setBackendConnected(true);
+          if (res?.data) {
+            setDatasetMeta({
+              activeDataset: res.data.dataset_name || 'm100_node1_digital_twin.csv',
+              totalRecords: res.data.total_records || 4917,
+              latestTimestamp: res.data.timestamp
+                ? new Date(res.data.timestamp).toLocaleString([], { dateStyle: 'short', timeStyle: 'medium' }) + ' UTC'
+                : '—'
+            });
+          }
+        }
       } catch (err) {
         if (isMounted) setBackendConnected(false);
       }
     }
 
     checkHealth();
-    const interval = setInterval(checkHealth, 15000);
+    const interval = setInterval(checkHealth, 10000);
 
     return () => {
       isMounted = false;
@@ -116,9 +133,9 @@ export default function App() {
     >
       {/* Top Application Header */}
       <Header
-        activeDataset="m100_node1_digital_twin.csv"
-        totalRecords={17280}
-        latestTimestamp="2026-10-23 18:30:00 UTC"
+        activeDataset={datasetMeta.activeDataset}
+        totalRecords={datasetMeta.totalRecords}
+        latestTimestamp={datasetMeta.latestTimestamp}
         backendConnected={backendConnected}
       />
 

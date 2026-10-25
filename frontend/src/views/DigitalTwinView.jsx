@@ -229,7 +229,7 @@ export default function DigitalTwinView({
         }}
       >
         <div>
-          Mapping Rule: Telemetry actively drives <code>RACK-A01</code>[cite: 1]. Adjacent racks represent unmonitored baseline hardware.
+          Mapping Rule: Telemetry actively drives <code>RACK-A01</code>. Adjacent racks represent unmonitored baseline hardware.
         </div>
         <div style={{ fontFamily: 'monospace', color: '#94a3b8' }}>
           Observation: {latestTelemetry?.timestamp || 'Dataset Stream Active'}

@@ -1,0 +1,869 @@
+{
+  "T1_observed_anomaly_label__causal_features": {
+    "MajorityClass": {
+      "n": 877,
+      "positives": 62,
+      "prevalence": 0.0707,
+      "threshold": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.071,
+      "brier": 0.0696,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          815,
+          0
+        ],
+        [
+          62,
+          0
+        ]
+      ]
+    },
+    "NaiveThreshold(temp_max>42.0)": {
+      "n": 877,
+      "positives": 62,
+      "prevalence": 0.0707,
+      "threshold": 0.5,
+      "precision": 0.353,
+      "recall": 0.484,
+      "f1": 0.408,
+      "pr_auc": 0.207,
+      "brier": 0.0992,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          760,
+          55
+        ],
+        [
+          32,
+          30
+        ]
+      ]
+    },
+    "RandomForest": {
+      "n": 877,
+      "positives": 62,
+      "prevalence": 0.0707,
+      "threshold": 0.1856,
+      "precision": 0.072,
+      "recall": 0.081,
+      "f1": 0.076,
+      "pr_auc": 0.206,
+      "brier": 0.0684,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          751,
+          64
+        ],
+        [
+          57,
+          5
+        ]
+      ],
+      "val_pr_auc": 0.055,
+      "brier_after_isotonic_val_calibration": 0.0651
+    },
+    "HistGB": {
+      "n": 877,
+      "positives": 62,
+      "prevalence": 0.0707,
+      "threshold": 0.027,
+      "precision": 0.102,
+      "recall": 0.081,
+      "f1": 0.09,
+      "pr_auc": 0.239,
+      "brier": 0.1029,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          771,
+          44
+        ],
+        [
+          57,
+          5
+        ]
+      ],
+      "val_pr_auc": 0.065,
+      "brier_after_isotonic_val_calibration": 0.0665
+    }
+  },
+  "T1b_observed_anomaly_label__WITH_rule_evidence_LEAKAGE_CHECK": {
+    "MajorityClass": {
+      "n": 877,
+      "positives": 62,
+      "prevalence": 0.0707,
+      "threshold": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.071,
+      "brier": 0.0696,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          815,
+          0
+        ],
+        [
+          62,
+          0
+        ]
+      ]
+    },
+    "NaiveThreshold(temp_max>42.0)": {
+      "n": 877,
+      "positives": 62,
+      "prevalence": 0.0707,
+      "threshold": 0.5,
+      "precision": 0.353,
+      "recall": 0.484,
+      "f1": 0.408,
+      "pr_auc": 0.207,
+      "brier": 0.0992,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          760,
+          55
+        ],
+        [
+          32,
+          30
+        ]
+      ]
+    },
+    "RandomForest": {
+      "n": 877,
+      "positives": 62,
+      "prevalence": 0.0707,
+      "threshold": 0.5493,
+      "precision": 1.0,
+      "recall": 0.21,
+      "f1": 0.347,
+      "pr_auc": 0.902,
+      "brier": 0.0273,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          815,
+          0
+        ],
+        [
+          49,
+          13
+        ]
+      ],
+      "val_pr_auc": 0.267,
+      "brier_after_isotonic_val_calibration": 0.0146
+    },
+    "HistGB": {
+      "n": 877,
+      "positives": 62,
+      "prevalence": 0.0707,
+      "threshold": 1.0,
+      "precision": 1.0,
+      "recall": 0.597,
+      "f1": 0.747,
+      "pr_auc": 0.908,
+      "brier": 0.0092,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          815,
+          0
+        ],
+        [
+          25,
+          37
+        ]
+      ],
+      "val_pr_auc": 0.28,
+      "brier_after_isotonic_val_calibration": 0.0091
+    }
+  },
+  "T1_INVALID_random_row_split_illustration": {
+    "HistGB": {
+      "n": 1353,
+      "positives": 31,
+      "prevalence": 0.0229,
+      "threshold": 0.5,
+      "precision": 0.969,
+      "recall": 1.0,
+      "f1": 0.984,
+      "pr_auc": 0.996,
+      "brier": 0.0009,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          1321,
+          1
+        ],
+        [
+          0,
+          31
+        ]
+      ]
+    },
+    "WARNING": "random row split of overlapping 20 s windows; neighbouring rows leak across train/test. Shown only to quantify inflation. Do NOT cite."
+  },
+  "T2_observed_future_anomaly_next15_onset_subset": {
+    "MajorityClass": {
+      "n": 682,
+      "positives": 13,
+      "prevalence": 0.0191,
+      "threshold": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.019,
+      "brier": 0.0187,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          669,
+          0
+        ],
+        [
+          13,
+          0
+        ]
+      ]
+    },
+    "NaiveThreshold(temp_max>42.0)": {
+      "n": 682,
+      "positives": 13,
+      "prevalence": 0.0191,
+      "threshold": 0.5,
+      "precision": 0.591,
+      "recall": 1.0,
+      "f1": 0.743,
+      "pr_auc": 0.591,
+      "brier": 0.0132,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          660,
+          9
+        ],
+        [
+          0,
+          13
+        ]
+      ]
+    },
+    "RandomForest": {
+      "n": 682,
+      "positives": 13,
+      "prevalence": 0.0191,
+      "threshold": 0.003,
+      "precision": 0.058,
+      "recall": 1.0,
+      "f1": 0.11,
+      "pr_auc": 0.061,
+      "brier": 0.0426,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          459,
+          210
+        ],
+        [
+          0,
+          13
+        ]
+      ],
+      "val_pr_auc": 0.016,
+      "brier_after_isotonic_val_calibration": 0.0184
+    },
+    "HistGB": {
+      "n": 682,
+      "positives": 13,
+      "prevalence": 0.0191,
+      "threshold": 0.0,
+      "precision": 0.03,
+      "recall": 1.0,
+      "f1": 0.059,
+      "pr_auc": 0.092,
+      "brier": 0.0526,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          252,
+          417
+        ],
+        [
+          0,
+          13
+        ]
+      ],
+      "val_pr_auc": 0.019,
+      "brier_after_isotonic_val_calibration": 0.0185
+    }
+  },
+  "T3_observed_fault_type_multiclass": {
+    "RandomForest": {
+      "macro_f1_over_classes_present_in_test": 0.287,
+      "per_class": {
+        "combined_anomaly": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 43.0
+        },
+        "fan_performance_anomaly": {
+          "precision": 0.182,
+          "recall": 0.2,
+          "f1-score": 0.19,
+          "support": 10.0
+        },
+        "normal": {
+          "precision": 0.931,
+          "recall": 0.989,
+          "f1-score": 0.959,
+          "support": 815.0
+        },
+        "power_anomaly": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 0.0
+        },
+        "thermal_anomaly": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 9.0
+        }
+      },
+      "labels": [
+        "combined_anomaly",
+        "fan_performance_anomaly",
+        "normal",
+        "power_anomaly",
+        "thermal_anomaly"
+      ],
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          43,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          8,
+          0,
+          0
+        ],
+        [
+          0,
+          9,
+          806,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          9,
+          0,
+          0
+        ]
+      ],
+      "classes_in_train": [
+        "fan_performance_anomaly",
+        "normal",
+        "power_anomaly"
+      ],
+      "classes_in_test": [
+        "combined_anomaly",
+        "fan_performance_anomaly",
+        "normal",
+        "thermal_anomaly"
+      ]
+    },
+    "HistGB": {
+      "macro_f1_over_classes_present_in_test": 0.282,
+      "per_class": {
+        "combined_anomaly": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 43.0
+        },
+        "fan_performance_anomaly": {
+          "precision": 0.125,
+          "recall": 0.3,
+          "f1-score": 0.176,
+          "support": 10.0
+        },
+        "normal": {
+          "precision": 0.931,
+          "recall": 0.971,
+          "f1-score": 0.95,
+          "support": 815.0
+        },
+        "power_anomaly": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 0.0
+        },
+        "thermal_anomaly": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 9.0
+        }
+      },
+      "labels": [
+        "combined_anomaly",
+        "fan_performance_anomaly",
+        "normal",
+        "power_anomaly",
+        "thermal_anomaly"
+      ],
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          43,
+          0,
+          0
+        ],
+        [
+          0,
+          3,
+          7,
+          0,
+          0
+        ],
+        [
+          0,
+          21,
+          791,
+          3,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          9,
+          0,
+          0
+        ]
+      ],
+      "classes_in_train": [
+        "fan_performance_anomaly",
+        "normal",
+        "power_anomaly"
+      ],
+      "classes_in_test": [
+        "combined_anomaly",
+        "fan_performance_anomaly",
+        "normal",
+        "thermal_anomaly"
+      ]
+    }
+  },
+  "S1_synthetic_label__binary": {
+    "MajorityClass": {
+      "n": 3320,
+      "positives": 1496,
+      "prevalence": 0.4506,
+      "threshold": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.451,
+      "brier": 0.2486,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          1824,
+          0
+        ],
+        [
+          1496,
+          0
+        ]
+      ]
+    },
+    "NaiveThreshold(temp_max>43.0)": {
+      "n": 3320,
+      "positives": 1496,
+      "prevalence": 0.4506,
+      "threshold": 0.5,
+      "precision": 0.489,
+      "recall": 0.045,
+      "f1": 0.082,
+      "pr_auc": 0.452,
+      "brier": 0.4515,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          1754,
+          70
+        ],
+        [
+          1429,
+          67
+        ]
+      ]
+    },
+    "RandomForest": {
+      "n": 3320,
+      "positives": 1496,
+      "prevalence": 0.4506,
+      "threshold": 0.7156,
+      "precision": 0.929,
+      "recall": 0.757,
+      "f1": 0.834,
+      "pr_auc": 0.949,
+      "brier": 0.0926,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          1737,
+          87
+        ],
+        [
+          363,
+          1133
+        ]
+      ],
+      "val_pr_auc": 0.937,
+      "brier_after_isotonic_val_calibration": 0.0947
+    },
+    "HistGB": {
+      "n": 3320,
+      "positives": 1496,
+      "prevalence": 0.4506,
+      "threshold": 0.8903,
+      "precision": 0.936,
+      "recall": 0.805,
+      "f1": 0.865,
+      "pr_auc": 0.954,
+      "brier": 0.0673,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          1741,
+          83
+        ],
+        [
+          292,
+          1204
+        ]
+      ],
+      "val_pr_auc": 0.947,
+      "brier_after_isotonic_val_calibration": 0.0866
+    }
+  },
+  "S2_synthetic_future_anomaly_next15_onset_subset": {
+    "MajorityClass": {
+      "n": 1657,
+      "positives": 240,
+      "prevalence": 0.1448,
+      "threshold": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.145,
+      "brier": 0.1239,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          1417,
+          0
+        ],
+        [
+          240,
+          0
+        ]
+      ]
+    },
+    "NaiveThreshold(temp_max>42.0)": {
+      "n": 1657,
+      "positives": 240,
+      "prevalence": 0.1448,
+      "threshold": 0.5,
+      "precision": 0.403,
+      "recall": 0.129,
+      "f1": 0.196,
+      "pr_auc": 0.178,
+      "brier": 0.1539,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          1371,
+          46
+        ],
+        [
+          209,
+          31
+        ]
+      ]
+    },
+    "RandomForest": {
+      "n": 1657,
+      "positives": 240,
+      "prevalence": 0.1448,
+      "threshold": 0.2742,
+      "precision": 0.273,
+      "recall": 0.2,
+      "f1": 0.231,
+      "pr_auc": 0.288,
+      "brier": 0.1193,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          1289,
+          128
+        ],
+        [
+          192,
+          48
+        ]
+      ],
+      "val_pr_auc": 0.278,
+      "brier_after_isotonic_val_calibration": 0.1214
+    },
+    "HistGB": {
+      "n": 1657,
+      "positives": 240,
+      "prevalence": 0.1448,
+      "threshold": 0.2205,
+      "precision": 0.189,
+      "recall": 0.221,
+      "f1": 0.204,
+      "pr_auc": 0.188,
+      "brier": 0.1348,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          1190,
+          227
+        ],
+        [
+          187,
+          53
+        ]
+      ],
+      "val_pr_auc": 0.233,
+      "brier_after_isotonic_val_calibration": 0.1258
+    }
+  },
+  "S3_synthetic_fault_type_multiclass": {
+    "RandomForest": {
+      "macro_f1_over_classes_present_in_test": 0.797,
+      "per_class": {
+        "combined_anomaly": {
+          "precision": 0.833,
+          "recall": 0.627,
+          "f1-score": 0.716,
+          "support": 263.0
+        },
+        "fan_performance_anomaly": {
+          "precision": 0.877,
+          "recall": 0.859,
+          "f1-score": 0.868,
+          "support": 548.0
+        },
+        "normal": {
+          "precision": 0.892,
+          "recall": 0.927,
+          "f1-score": 0.909,
+          "support": 1824.0
+        },
+        "power_anomaly": {
+          "precision": 0.961,
+          "recall": 0.589,
+          "f1-score": 0.731,
+          "support": 207.0
+        },
+        "thermal_anomaly": {
+          "precision": 0.703,
+          "recall": 0.828,
+          "f1-score": 0.761,
+          "support": 478.0
+        }
+      },
+      "labels": [
+        "combined_anomaly",
+        "fan_performance_anomaly",
+        "normal",
+        "power_anomaly",
+        "thermal_anomaly"
+      ],
+      "confusion_matrix": [
+        [
+          165,
+          59,
+          8,
+          3,
+          28
+        ],
+        [
+          6,
+          471,
+          41,
+          0,
+          30
+        ],
+        [
+          21,
+          7,
+          1691,
+          2,
+          103
+        ],
+        [
+          3,
+          0,
+          76,
+          122,
+          6
+        ],
+        [
+          3,
+          0,
+          79,
+          0,
+          396
+        ]
+      ],
+      "classes_in_train": [
+        "combined_anomaly",
+        "fan_performance_anomaly",
+        "normal",
+        "power_anomaly",
+        "thermal_anomaly"
+      ],
+      "classes_in_test": [
+        "combined_anomaly",
+        "fan_performance_anomaly",
+        "normal",
+        "power_anomaly",
+        "thermal_anomaly"
+      ]
+    },
+    "HistGB": {
+      "macro_f1_over_classes_present_in_test": 0.759,
+      "per_class": {
+        "combined_anomaly": {
+          "precision": 0.567,
+          "recall": 0.437,
+          "f1-score": 0.494,
+          "support": 263.0
+        },
+        "fan_performance_anomaly": {
+          "precision": 0.879,
+          "recall": 0.865,
+          "f1-score": 0.872,
+          "support": 548.0
+        },
+        "normal": {
+          "precision": 0.912,
+          "recall": 0.933,
+          "f1-score": 0.922,
+          "support": 1824.0
+        },
+        "power_anomaly": {
+          "precision": 0.905,
+          "recall": 0.599,
+          "f1-score": 0.721,
+          "support": 207.0
+        },
+        "thermal_anomaly": {
+          "precision": 0.72,
+          "recall": 0.868,
+          "f1-score": 0.787,
+          "support": 478.0
+        }
+      },
+      "labels": [
+        "combined_anomaly",
+        "fan_performance_anomaly",
+        "normal",
+        "power_anomaly",
+        "thermal_anomaly"
+      ],
+      "confusion_matrix": [
+        [
+          115,
+          58,
+          11,
+          9,
+          70
+        ],
+        [
+          30,
+          474,
+          35,
+          0,
+          9
+        ],
+        [
+          33,
+          7,
+          1701,
+          4,
+          79
+        ],
+        [
+          23,
+          0,
+          57,
+          124,
+          3
+        ],
+        [
+          2,
+          0,
+          61,
+          0,
+          415
+        ]
+      ],
+      "classes_in_train": [
+        "combined_anomaly",
+        "fan_performance_anomaly",
+        "normal",
+        "power_anomaly",
+        "thermal_anomaly"
+      ],
+      "classes_in_test": [
+        "combined_anomaly",
+        "fan_performance_anomaly",
+        "normal",
+        "power_anomaly",
+        "thermal_anomaly"
+      ]
+    }
+  },
+  "X1_cross_domain_synthetic_to_observed_heuristic": {
+    "HistGB(synthetic-train -> observed-test)": {
+      "n": 877,
+      "positives": 62,
+      "prevalence": 0.0707,
+      "threshold": 0.8903,
+      "precision": 0.457,
+      "recall": 0.597,
+      "f1": 0.517,
+      "pr_auc": 0.499,
+      "brier": 0.0797,
+      "confusion_matrix[[TN,FP],[FN,TP]]": [
+        [
+          771,
+          44
+        ],
+        [
+          25,
+          37
+        ]
+      ]
+    }
+  }
+}

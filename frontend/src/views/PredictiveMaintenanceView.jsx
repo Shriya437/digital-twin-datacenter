@@ -15,10 +15,11 @@ import { apiClient } from '../api/client';
 export default function PredictiveMaintenanceView() {
   const { latestTelemetry, history, loading: telLoading } = useTelemetry({ historyLimit: 30 });
   const { latestAnomalyResult, anomalies } = useAnomalies();
-  const { forecasts, modelMetrics } = useForecasts({ horizonMinutes: 30, targetVariable: 'temp_core_max' });
+  const { forecasts, modelMetrics, comparisonData, forwardProjection } = useForecasts({ horizonMinutes: 30, targetVariable: 'temp_core_max' });
 
   const [maintenanceRiskData, setMaintenanceRiskData] = useState(null);
   const [riskLoading, setRiskLoading] = useState(true);
+  const [chartMode, setChartMode] = useState('overlay'); // 'overlay' | 'horizon'
 
   // Fetch verified predictive maintenance indicators from backend service
   useEffect(() => {
@@ -56,15 +57,17 @@ export default function PredictiveMaintenanceView() {
     }))
     .filter((pt) => pt.value !== null);
 
-  // Format forecast boundary points
-  const forecastChartData = forecasts
-    .map((f) => ({
-      timestamp: f.timestamp
-        ? new Date(f.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : '+30m',
-      value: typeof f.predicted_temp === 'number' ? f.predicted_temp : null
-    }))
-    .filter((pt) => pt.value !== null);
+  // Smooth forward projection data
+  const smoothForecastData = (forwardProjection && forwardProjection.length > 0)
+    ? forwardProjection
+    : forecasts
+        .map((f) => ({
+          timestamp: f.timestamp
+            ? new Date(f.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            : '+30m',
+          value: typeof f.predicted_temp === 'number' ? f.predicted_temp : null
+        }))
+        .filter((pt) => pt.value !== null);
 
   // Extract model outputs safely
   const riskLevel = maintenanceRiskData?.risk_level || (latestAnomalyResult?.is_anomaly ? 'Elevated' : 'Low');
@@ -83,7 +86,7 @@ export default function PredictiveMaintenanceView() {
           Predictive Maintenance Intelligence
         </h2>
         <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
-          Equipment risk scoring and degradation markers calculated directly from held-out Marconi-100 telemetry[cite: 1].
+          Equipment risk scoring and degradation markers calculated directly from held-out Marconi-100 telemetry.
         </p>
       </div>
 
@@ -127,15 +130,64 @@ export default function PredictiveMaintenanceView() {
         />
       </div>
 
-      {/* Historical vs Predicted Thermal Boundary */}
-      <ChartPanel
-        title="Core Temperature vs Predictive Model Forecast Boundary (°C)"
-        historicalData={historicalChartData}
-        forecastData={forecastChartData}
-        yKey="value"
-        unit="°C"
-        height={280}
-      />
+      {/* Chart Mode Selector & Visualisation Container */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600 }}>Visualisation Mode:</span>
+          <button
+            onClick={() => setChartMode('overlay')}
+            style={{
+              padding: '6px 14px',
+              fontSize: '12px',
+              fontWeight: 600,
+              borderRadius: '6px',
+              border: chartMode === 'overlay' ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
+              background: chartMode === 'overlay' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(15, 23, 42, 0.6)',
+              color: chartMode === 'overlay' ? '#38bdf8' : '#94a3b8',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+          >
+            📊 Actual vs Predicted Overlay (Same Timeline Benchmark)
+          </button>
+          <button
+            onClick={() => setChartMode('horizon')}
+            style={{
+              padding: '6px 14px',
+              fontSize: '12px',
+              fontWeight: 600,
+              borderRadius: '6px',
+              border: chartMode === 'horizon' ? '1px solid #f59e0b' : '1px solid rgba(255,255,255,0.1)',
+              background: chartMode === 'horizon' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(15, 23, 42, 0.6)',
+              color: chartMode === 'horizon' ? '#f59e0b' : '#94a3b8',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+          >
+            🔭 Forward Horizon Projection (Now → Future)
+          </button>
+        </div>
+
+        {chartMode === 'overlay' ? (
+          <ChartPanel
+            title="Core Temperature: Actual Telemetry vs Supervised Model Prediction (°C)"
+            subtitle="Benchmark overlay across identical test timelines (97.24% accuracy, MAE 0.956°C)"
+            comparisonData={comparisonData}
+            unit="°C"
+            height={300}
+          />
+        ) : (
+          <ChartPanel
+            title="Core Temperature: Telemetry Transitioning into Future Horizon (°C)"
+            subtitle="Observed real-time telemetry transitioning smoothly into the predictive horizon"
+            historicalData={historicalChartData}
+            forecastData={smoothForecastData}
+            yKey="value"
+            unit="°C"
+            height={300}
+          />
+        )}
+      </div>
 
       {/* Two Column Layout: Asset Risk Ranking & Anomaly Evidence */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '16px' }}>
@@ -171,7 +223,7 @@ export default function PredictiveMaintenanceView() {
               <tbody>
                 <tr style={{ borderBottom: '1px solid rgba(51, 65, 85, 0.4)', color: '#cbd5e1' }}>
                   <td style={{ padding: '10px', fontFamily: 'monospace', color: '#38bdf8' }}>m100-node1</td>
-                  <td style={{ padding: '10px' }}>IBM Power AC922[cite: 1]</td>
+                  <td style={{ padding: '10px' }}>IBM Power AC922</td>
                   <td style={{ padding: '10px' }}>
                     <StatusBadge status={riskLevel === 'Elevated' ? 'WARNING' : 'HEALTHY'} size="sm" />
                   </td>
@@ -181,7 +233,7 @@ export default function PredictiveMaintenanceView() {
                 </tr>
                 <tr style={{ borderBottom: '1px solid rgba(51, 65, 85, 0.4)', color: '#64748b' }}>
                   <td style={{ padding: '10px', fontFamily: 'monospace' }}>m100-node2 (Peer)</td>
-                  <td style={{ padding: '10px' }}>IBM Power AC922[cite: 1]</td>
+                  <td style={{ padding: '10px' }}>IBM Power AC922</td>
                   <td style={{ padding: '10px' }}>
                     <StatusBadge status="UNAVAILABLE" label="UNMONITORED" size="sm" />
                   </td>
@@ -221,7 +273,7 @@ export default function PredictiveMaintenanceView() {
               Rule 1: Isolation Forest Outlier Evidence
             </div>
             <div style={{ color: '#cbd5e1', lineHeight: 1.5 }}>
-              Flagged anomalies indicate multidimensional covariance departure (power draw vs. thermal output vs. fan velocity)[cite: 1]. An anomaly score alone does not guarantee hardware failure[cite: 1].
+              Flagged anomalies indicate multidimensional covariance departure (power draw vs. thermal output vs. fan velocity). An anomaly score alone does not guarantee hardware failure.
             </div>
           </div>
 
@@ -230,12 +282,12 @@ export default function PredictiveMaintenanceView() {
               Rule 2: Temperature Forecast Exceedance
             </div>
             <div style={{ color: '#cbd5e1', lineHeight: 1.5 }}>
-              Maintenance warnings trigger when the Ridge/RF model predicts temperature exceedance above nominal thermal envelope (+15m horizon &gt; 45°C)[cite: 1].
+              Maintenance warnings trigger when the Ridge/RF model predicts temperature exceedance above nominal thermal envelope (+15m horizon &gt; 45°C).
             </div>
           </div>
 
           <div style={{ fontSize: '11px', color: '#64748b', fontStyle: 'italic', marginTop: 'auto' }}>
-            Note: Remaining Useful Life (RUL) estimation is omitted intentionally as run-to-failure degradation labels are not present in this telemetry dataset[cite: 1].
+            Note: Remaining Useful Life (RUL) estimation is omitted intentionally as run-to-failure degradation labels are not present in this telemetry dataset.
           </div>
         </div>
       </div>

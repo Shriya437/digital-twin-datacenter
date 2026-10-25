@@ -21,13 +21,13 @@ export default function SensorMarker3D({
 
   // Derive status colors directly from real thermal thresholds and ML anomaly outputs
   const markerColor = useMemo(() => {
-    if (isAnomaly) return '#ef4444'; // Red alert beacon[cite: 1]
-    if (tempValue > 40) return '#f59e0b'; // Amber elevated thermal state[cite: 1]
+    if (isAnomaly) return '#ef4444'; // Red alert beacon
+    if (tempValue > 40) return '#f59e0b'; // Amber elevated thermal state
     if (viewMode === 'thermal') {
-      // Dynamic thermal gradient[cite: 1]
+      // Dynamic thermal gradient
       return tempValue < 25 ? '#00f2fe' : tempValue < 35 ? '#38bdf8' : '#f97316';
     }
-    return '#00f2fe'; // Nominal cyan[cite: 1]
+    return '#00f2fe'; // Nominal cyan
   }, [isAnomaly, tempValue, viewMode]);
 
   // Floating bob and ring pulse animations
@@ -173,7 +173,7 @@ export default function SensorMarker3D({
                   textTransform: 'uppercase'
                 }}
               >
-                ANOMALY[cite: 1]
+                ANOMALY
               </span>
             )}
           </div>

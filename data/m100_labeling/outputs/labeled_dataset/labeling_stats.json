@@ -1,0 +1,27 @@
+{
+  "class_counts": {
+    "normal": 4465,
+    "ambiguous_unknown": 292,
+    "insufficient_context": 56,
+    "combined_anomaly": 43,
+    "fan_performance_anomaly": 35,
+    "thermal_anomaly": 22,
+    "power_anomaly": 4
+  },
+  "synthetic_rule_agreement": {
+    "rows": {
+      "combined_anomaly": 1025.0,
+      "fan_performance_anomaly": 2117.0,
+      "power_anomaly": 1046.0,
+      "thermal_anomaly": 1973.0,
+      "ALL injected-active": 6161.0
+    },
+    "rule_recall": {
+      "combined_anomaly": 0.736,
+      "fan_performance_anomaly": 0.419,
+      "power_anomaly": 0.025,
+      "thermal_anomaly": 0.818,
+      "ALL injected-active": 0.532
+    }
+  }
+}

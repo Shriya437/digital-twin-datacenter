@@ -148,18 +148,18 @@ export default function Rack3D({
         rack: id,
         slot: 'U12 - U14',
         status: hasAnomaly ? 'ANOMALOUS' : 'NORMAL',
-        temperatures: isMonitoredNode
+        temperatures: telemetryData
           ? {
               cpu0: tempValue,
               cpu1: Number((tempValue + 0.4).toFixed(1)),
               gpu0: Number((tempValue + 4.7).toFixed(1)),
               gpu1: Number((tempValue + 4.1).toFixed(1)),
-              inlet: telemetryData?.inlet_temp || 21.0
+              inlet: telemetryData?.inlet_temp ?? 21.4
             }
           : null,
-        powerWatts: isMonitoredNode ? (telemetryData?.total_power || 1240.5) : 'Unavailable',
-        fansRpm: isMonitoredNode ? (telemetryData?.fan_rpm || 4850) : 'Unavailable',
-        timestamp: telemetryData?.timestamp || '2026-10-23 18:30:00 UTC',
+        powerWatts: telemetryData?.total_power ?? telemetryData?.power ?? 'Unavailable',
+        fansRpm: telemetryData?.fan_rpm ?? 'Unavailable',
+        timestamp: telemetryData?.timestamp || 'Unavailable',
         mlAnomalyDetected: hasAnomaly,
         isolationForestScore: mlAnomalyResult?.score || 0.042,
         pcaReconstructionError: mlAnomalyResult?.pca_error || 0.018,

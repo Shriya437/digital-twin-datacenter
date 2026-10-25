@@ -16,6 +16,8 @@ export function useForecasts({
   targetVariable = 'temp_core_max',
   nodeId = 'node1'
 } = {}) {
+  const [comparisonData, setComparisonData] = useState([]);
+  const [forwardProjection, setForwardProjection] = useState([]);
   const [forecasts, setForecasts] = useState([]);
   const [modelMetrics, setModelMetrics] = useState(null);
   const [modelInfo, setModelInfo] = useState(null);
@@ -45,6 +47,8 @@ export function useForecasts({
         : [];
 
       setForecasts(forecastList);
+      setComparisonData(Array.isArray(data.comparison_data) ? data.comparison_data : []);
+      setForwardProjection(Array.isArray(data.forward_projection) ? data.forward_projection : []);
       setModelMetrics(data.metrics || null);
       setModelInfo({
         modelName: data.model_name || data.algorithm || 'Ridge/RandomForest Ensemble',
@@ -58,6 +62,8 @@ export function useForecasts({
       const msg = err.response?.data?.detail || err.message || 'Failed to fetch ML forecasts';
       setError(msg);
       setForecasts([]);
+      setComparisonData([]);
+      setForwardProjection([]);
       setModelMetrics(null);
       setModelInfo(null);
     } finally {
@@ -83,6 +89,8 @@ export function useForecasts({
 
   return {
     forecasts,
+    comparisonData,
+    forwardProjection,
     modelMetrics,
     modelInfo,
     loading,

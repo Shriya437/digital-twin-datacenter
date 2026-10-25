@@ -68,7 +68,7 @@ export default function AnomalyDetectionView() {
           ML Anomaly Detection & Statistical Outlier Analysis
         </h2>
         <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
-          Unsupervised multidimensional anomaly detection trained on held-out Marconi-100 telemetry[cite: 1].
+          Unsupervised multidimensional anomaly detection trained on held-out Marconi-100 telemetry.
         </p>
       </div>
 
@@ -271,7 +271,7 @@ export default function AnomalyDetectionView() {
               <strong style={{ color: '#f87171' }}>
                 {filteredAnomalies[selectedRecord].anomaly_score ?? filteredAnomalies[selectedRecord].score}
               </strong>
-              . Multidimensional sensor relationship diverged from nominal training distribution[cite: 1].
+              . Multidimensional sensor relationship diverged from nominal training distribution.
             </p>
           </div>
         )}

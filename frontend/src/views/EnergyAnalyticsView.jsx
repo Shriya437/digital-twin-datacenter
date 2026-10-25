@@ -126,6 +126,7 @@ export default function EnergyAnalyticsView() {
       {/* Primary Measured Power Time-Series Chart */}
       <ChartPanel
         title="Recorded Node Power Consumption Trajectory (Watts)"
+        subtitle="Active electrical load draw recorded from IBM Power AC922 dual redundant power supplies"
         historicalData={powerChartData}
         forecastData={[]}
         yKey="value"
@@ -136,7 +137,7 @@ export default function EnergyAnalyticsView() {
       {/* Dual Section: Empirical Thermal-Power Scatter vs What-If Simulator */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '16px' }}>
         
-        {/* Empirical Measurements & PUE Boundaries */}
+        {/* Empirical Measurements & Boundaries */}
         <div
           style={{
             background: 'rgba(15, 23, 42, 0.85)',
@@ -162,16 +163,12 @@ export default function EnergyAnalyticsView() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: '#94a3b8' }}>Peak Compute Load Draw</span>
-              <span style={{ color: '#f8fafc', fontFamily: 'monospace' }}>~1,850 W (2x POWER9 + 4x V100)[cite: 1]</span>
+              <span style={{ color: '#f8fafc', fontFamily: 'monospace' }}>~1,850 W (2x POWER9 + 4x V100)</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: '#94a3b8' }}>Dynamic Range</span>
               <span style={{ color: '#38bdf8', fontFamily: 'monospace' }}>1,430 W delta</span>
             </div>
-          </div>
-
-          <div style={{ padding: '10px 12px', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(251, 191, 36, 0.25)', borderRadius: '6px', fontSize: '11px', color: '#fbbf24', lineHeight: 1.5 }}>
-            <strong>Why is Facility PUE marked Unavailable?</strong> PUE = Total Facility Energy / IT Equipment Energy. Because the dataset provides only node-level telemetry (IT power) and lacks chiller plant, UPS losses, and substation meters, computing PUE would be fabricated[cite: 1].
           </div>
         </div>
 

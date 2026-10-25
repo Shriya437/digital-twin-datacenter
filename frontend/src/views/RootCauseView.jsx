@@ -84,7 +84,7 @@ export default function RootCauseView() {
           Root Cause Diagnostics & Evidence Analysis
         </h2>
         <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
-          Infers causal hypotheses along physical and logical equipment chains using dependency graph propagation[cite: 1].
+          Infers causal hypotheses along physical and logical equipment chains using dependency graph propagation.
         </p>
       </div>
 
@@ -163,8 +163,8 @@ export default function RootCauseView() {
           </div>
           <p style={{ margin: 0, fontSize: '12px', color: '#cbd5e1', lineHeight: 1.6 }}>
             {isAnomaly
-              ? 'Telemetry evidence shows a statistical departure where fan speed and total power draw do not balance the core temperature trajectory, indicating airflow restriction or cooling lag[cite: 1].'
-              : 'Observed telemetry measurements for power, core temperatures, and fan speeds reside within nominal training distributions[cite: 1]. The dependency graph has not triggered any fault propagation pathways[cite: 1].'}
+              ? 'Telemetry evidence shows a statistical departure where fan speed and total power draw do not balance the core temperature trajectory, indicating airflow restriction or cooling lag.'
+              : 'Observed telemetry measurements for power, core temperatures, and fan speeds reside within nominal training distributions. The dependency graph has not triggered any fault propagation pathways.'}
           </p>
         </div>
 
@@ -195,7 +195,7 @@ export default function RootCauseView() {
                 Total Power: {currentPower}
               </div>
               <span style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px', display: 'block' }}>
-                Baseline range: 800W – 1600W[cite: 1]
+                Baseline range: 800W – 1600W
               </span>
             </div>
 
@@ -239,7 +239,7 @@ export default function RootCauseView() {
                 Power Bus ➔ Voltage Regulators ➔ Compute Blades
               </div>
               <div style={{ color: '#94a3b8', fontSize: '11px' }}>
-                Monitors power step-downs and transient spikes feeding IBM POWER9 sockets[cite: 1].
+                Monitors power step-downs and transient spikes feeding IBM POWER9 sockets.
               </div>
             </div>
 
@@ -248,7 +248,7 @@ export default function RootCauseView() {
                 CRAH Units ➔ Cold Aisle Plenum ➔ Chassis Fan Intake
               </div>
               <div style={{ color: '#94a3b8', fontSize: '11px' }}>
-                Traces ambient supply temperature from perimeter cooling to internal server blades[cite: 1].
+                Traces ambient supply temperature from perimeter cooling to internal server blades.
               </div>
             </div>
 
@@ -257,7 +257,7 @@ export default function RootCauseView() {
                 Core Thermal Headroom ➔ GPU/CPU Clock Scaling
               </div>
               <div style={{ color: '#94a3b8', fontSize: '11px' }}>
-                Evaluates automatic frequency throttling if core thermal readings approach 85°C[cite: 1].
+                Evaluates automatic frequency throttling if core thermal readings approach 85°C.
               </div>
             </div>
           </div>
@@ -282,22 +282,22 @@ export default function RootCauseView() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px', color: '#cbd5e1' }}>
             <div style={{ padding: '8px 10px', background: 'rgba(30, 41, 59, 0.3)', borderRadius: '6px' }}>
               <strong style={{ color: '#94a3b8' }}>Chiller Loop Telemetry:</strong>{' '}
-              <span style={{ color: '#f87171' }}>Unavailable</span>. Facility chiller water return temperatures are outside the node dataset scope[cite: 1].
+              <span style={{ color: '#f87171' }}>Unavailable</span>. Facility chiller water return temperatures are outside the node dataset scope.
             </div>
 
             <div style={{ padding: '8px 10px', background: 'rgba(30, 41, 59, 0.3)', borderRadius: '6px' }}>
               <strong style={{ color: '#94a3b8' }}>Individual Component Thermal Sensors:</strong>{' '}
-              <span style={{ color: '#34d399' }}>Available</span>. Core temperatures and aggregate power draws are recorded directly from m100_node1[cite: 1].
+              <span style={{ color: '#34d399' }}>Available</span>. Core temperatures and aggregate power draws are recorded directly from m100_node1.
             </div>
 
             <div style={{ padding: '8px 10px', background: 'rgba(30, 41, 59, 0.3)', borderRadius: '6px' }}>
               <strong style={{ color: '#94a3b8' }}>Operating System Logs (dmesg / IPMI SEL):</strong>{' '}
-              <span style={{ color: '#64748b' }}>Not ingested</span>. Diagnostic decisions rely exclusively on telemetry time-series analysis and graph propagation rules[cite: 1].
+              <span style={{ color: '#64748b' }}>Not ingested</span>. Diagnostic decisions rely exclusively on telemetry time-series analysis and graph propagation rules.
             </div>
           </div>
 
           <div style={{ marginTop: 'auto', fontSize: '11px', color: '#64748b', fontStyle: 'italic' }}>
-            Strict Rule: Root-cause hypotheses are only asserted when supported by empirical correlation or anomaly evidence[cite: 1].
+            Strict Rule: Root-cause hypotheses are only asserted when supported by empirical correlation or anomaly evidence.
           </div>
         </div>
       </div>

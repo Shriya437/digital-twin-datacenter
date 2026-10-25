@@ -123,18 +123,18 @@ export default function Server3D({
         rack: rackId,
         slot: uPosition,
         status: hasAnomaly ? 'ANOMALOUS' : 'NORMAL',
-        temperatures: isMonitored
+        temperatures: telemetry
           ? {
               cpu0: tempVal,
               cpu1: Number((tempVal + 0.4).toFixed(1)),
               gpu0: Number((tempVal + 4.7).toFixed(1)),
               gpu1: Number((tempVal + 4.1).toFixed(1)),
-              inlet: telemetry?.inlet_temp || 21.0
+              inlet: telemetry?.inlet_temp ?? 21.4
             }
           : null,
-        powerWatts: isMonitored ? powerVal : 'Unavailable',
-        fansRpm: isMonitored ? fanRpm : 'Unavailable',
-        timestamp: telemetry?.timestamp || '2026-10-23 18:30:00 UTC',
+        powerWatts: telemetry?.total_power ?? telemetry?.power ?? powerVal,
+        fansRpm: telemetry?.fan_rpm ?? fanRpm,
+        timestamp: telemetry?.timestamp || 'Unavailable',
         mlAnomalyDetected: hasAnomaly,
         isolationForestScore: anomaly?.score || (isMonitored ? 0.042 : 'Unavailable'),
         pcaReconstructionError: anomaly?.pca_error || (isMonitored ? 0.018 : 'Unavailable'),

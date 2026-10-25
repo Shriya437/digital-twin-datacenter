@@ -63,9 +63,26 @@ import matplotlib.dates as mdates
 import numpy as np
 import pandas as pd
 
-from sklearn.ensemble import HistGradientBoostingRegressor, RandomForestRegressor
+from sklearn.ensemble import (
+    HistGradientBoostingRegressor,
+    RandomForestRegressor,
+    HistGradientBoostingClassifier,
+    RandomForestClassifier,
+)
 from sklearn.impute import SimpleImputer
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import (
+    accuracy_score,
+    mean_absolute_error,
+    mean_squared_error,
+    r2_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    roc_auc_score,
+    average_precision_score,
+    classification_report,
+    confusion_matrix,
+)
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -75,6 +92,26 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 # ============================================================
 # CONFIGURATION & TELEMETRY DEFINITIONS
 # ============================================================
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+DEFAULT_LABELED_INPUT = (
+    BASE_DIR
+    / "data"
+    / "m100_labeling"
+    / "outputs"
+    / "labeled_dataset"
+    / "m100_node1_labeled_observed.csv"
+)
+
+DEFAULT_SYNTHETIC_INPUT = (
+    BASE_DIR
+    / "data"
+    / "m100_labeling"
+    / "outputs"
+    / "labeled_dataset"
+    / "m100_synthetic_fault_scenarios.csv"
+)
 
 POWER_METRICS = [
     "total_power",
@@ -147,6 +184,12 @@ def parse_arguments():
     )
 
     parser.add_argument(
+        "--synthetic-input",
+        default=str(DEFAULT_SYNTHETIC_INPUT),
+        help="Path to the synthetic fault scenarios CSV file (default: data/m100_labeling/outputs/labeled_dataset/m100_synthetic_fault_scenarios.csv)",
+    )
+
+    parser.add_argument(
         "--output-dir",
         default="outputs/member3_outputs",
         help="Directory for generated analytics outputs (default: outputs/member3_outputs)",
@@ -202,6 +245,10 @@ def load_telemetry(input_path):
     """Load, validate and chronologically sort telemetry dataframe."""
     input_path = Path(input_path)
 
+    # Prefer labeled observed dataset if the default input was passed or not found
+    if (not input_path.exists() or input_path.name == "m100_node1_digital_twin.csv") and DEFAULT_LABELED_INPUT.exists():
+        input_path = DEFAULT_LABELED_INPUT
+
     if not input_path.exists():
         raise FileNotFoundError(f"Telemetry CSV not found: {input_path.resolve()}")
 
@@ -228,6 +275,11 @@ def load_telemetry(input_path):
         df[column] = pd.to_numeric(df[column], errors="coerce")
         df[column] = df[column].replace([np.inf, -np.inf], np.nan)
 
+    # Preserve and cast label and metadata columns if present
+    for label_col in ["anomaly_label", "label_valid", "anomaly_within_next_15"]:
+        if label_col in df.columns:
+            df[label_col] = pd.to_numeric(df[label_col], errors="coerce")
+
     # Chronologically sort with stable mergesort
     df = df.sort_values("timestamp", kind="mergesort").reset_index(drop=True)
 
@@ -237,6 +289,10 @@ def load_telemetry(input_path):
     print(f"File path: {input_path}")
     print(f"Total valid timestamp records: {len(df)}")
     print(f"Invalid timestamps removed:    {invalid_timestamps}")
+    if "split" in df.columns:
+        print(f"Split distribution:            {dict(df['split'].value_counts())}")
+    if "anomaly_label" in df.columns:
+        print(f"Anomaly label counts:          {dict(df['anomaly_label'].value_counts())}")
     print(f"Start timestamp (UTC):         {df['timestamp'].min()}")
     print(f"End timestamp (UTC):           {df['timestamp'].max()}")
 
@@ -1111,12 +1167,16 @@ def prepare_forecasting_dataset(
         [target_metric, "p1_vdd_temp", "total_power", "p0_power", "fan0_0", "ambient"],
     )
 
-    work = df[["timestamp"] + feature_cols_base].copy()
+    metadata_cols = [c for c in ["split", "anomaly_label", "fault_type", "label_valid", "segment_id"] if c in df.columns]
+    work = df[["timestamp"] + feature_cols_base + metadata_cols].copy()
 
-    # Define continuous segments
-    dt = work["timestamp"].diff().dt.total_seconds()
-    segment_break = dt.isna() | (dt <= 0) | (dt > max_gap_seconds)
-    work["_segment"] = segment_break.cumsum()
+    # Define continuous segments (prefer segment_id from labeled dataset if present)
+    if "segment_id" in df.columns:
+        work["_segment"] = pd.to_numeric(df["segment_id"], errors="coerce").fillna(0).astype(int)
+    else:
+        dt = work["timestamp"].diff().dt.total_seconds()
+        segment_break = dt.isna() | (dt <= 0) | (dt > max_gap_seconds)
+        work["_segment"] = segment_break.cumsum()
 
     feature_names = []
 
@@ -1172,6 +1232,7 @@ def train_and_evaluate_temperature_forecast(
     horizon_minutes=5.0,
     asset_id="M100_NODE_1",
     max_gap_seconds=DEFAULT_MAX_GAP_SECONDS,
+    synthetic_input=None,
 ):
     """
     Trains forecasting models from telemetry, evaluates forecast accuracy
@@ -1210,10 +1271,14 @@ def train_and_evaluate_temperature_forecast(
         print("Insufficient samples for train/test split. Skipping forecast.")
         return
 
-    # Chronological Train/Test Split (80% train, 20% test) - NO random shuffle!
-    split_idx = int(len(data) * 0.8)
-    train_df = data.iloc[:split_idx]
-    test_df = data.iloc[split_idx:].copy()
+    # Chronological Train/Test Split (respect official 'split' column if available)
+    if "split" in data.columns and (data["split"] == "train").any() and (data["split"] == "test").any():
+        train_df = data[data["split"] == "train"]
+        test_df = data[data["split"] == "test"].copy()
+    else:
+        split_idx = int(len(data) * 0.8)
+        train_df = data.iloc[:split_idx]
+        test_df = data.iloc[split_idx:].copy()
 
     X_train = train_df[feature_names]
     y_train = train_df["future_target"]
@@ -1269,6 +1334,7 @@ def train_and_evaluate_temperature_forecast(
 
         mae_imp = ((base_mae - mae) / base_mae) * 100.0 if base_mae > 0 else 0.0
         rmse_imp = ((base_rmse - rmse) / base_rmse) * 100.0 if base_rmse > 0 else 0.0
+        forecast_acc = max(0.0, 100.0 - mape)
 
         eval_records.append({
             "model": name,
@@ -1280,6 +1346,7 @@ def train_and_evaluate_temperature_forecast(
             "rmse": round(rmse, 4),
             "r2_score": round(r2, 4),
             "mape_percent": round(mape, 3),
+            "forecast_accuracy_pct": round(forecast_acc, 2),
             "mae_improvement_over_baseline_pct": round(mae_imp, 2),
             "rmse_improvement_over_baseline_pct": round(rmse_imp, 2),
         })
@@ -1290,6 +1357,7 @@ def train_and_evaluate_temperature_forecast(
             best_name = name
 
     # Add persistence baseline record
+    base_forecast_acc = max(0.0, 100.0 - base_mape)
     eval_records.append({
         "model": "PersistenceBaseline",
         "target_metric": target_metric,
@@ -1300,6 +1368,7 @@ def train_and_evaluate_temperature_forecast(
         "rmse": round(base_rmse, 4),
         "r2_score": round(base_r2, 4),
         "mape_percent": round(base_mape, 3),
+        "forecast_accuracy_pct": round(base_forecast_acc, 2),
         "mae_improvement_over_baseline_pct": 0.0,
         "rmse_improvement_over_baseline_pct": 0.0,
     })
@@ -1308,7 +1377,7 @@ def train_and_evaluate_temperature_forecast(
     eval_df.to_csv(output_dir / "temperature_forecast_evaluation.csv", index=False)
 
     print("\nFORECAST ACCURACY EVALUATION (ALL MODELS):")
-    print(eval_df[["model", "mae", "rmse", "r2_score", "mape_percent"]].to_string(index=False))
+    print(eval_df[["model", "mae", "rmse", "r2_score", "mape_percent", "forecast_accuracy_pct"]].to_string(index=False))
 
     # Designate the best ML model predictions as the primary prediction series
     test_df["predicted_future_temperature"] = test_df[f"pred_{best_name}"]
@@ -1353,6 +1422,73 @@ def train_and_evaluate_temperature_forecast(
 
     # Plot actual vs predicted future temperature using best model
     plot_forecast_results(test_df, best_eval, output_dir, target_metric, horizon_minutes)
+
+    # Benchmark best forecaster under synthetic fault scenarios
+    syn_path = Path(synthetic_input) if synthetic_input else DEFAULT_SYNTHETIC_INPUT
+    if syn_path.exists() and best_pipeline is not None:
+        try:
+            syn_df = pd.read_csv(syn_path)
+            if "base_timestamp" in syn_df.columns and "timestamp" not in syn_df.columns:
+                step_offsets = pd.to_numeric(syn_df.get("step_in_scenario", 0), errors="coerce").fillna(0)
+                syn_df["timestamp"] = pd.to_datetime(syn_df["base_timestamp"], errors="coerce", utc=True) + pd.to_timedelta(step_offsets * 20, unit="s")
+            elif "timestamp" in syn_df.columns:
+                syn_df["timestamp"] = pd.to_datetime(syn_df["timestamp"], errors="coerce", utc=True)
+
+            for m in POWER_METRICS + TEMPERATURE_METRICS + FAN_METRICS + ENVIRONMENT_METRICS:
+                if m in syn_df.columns:
+                    syn_df[m] = pd.to_numeric(syn_df[m], errors="coerce")
+
+            syn_df["_segment"] = syn_df["scenario_id"] if "scenario_id" in syn_df.columns else 0
+
+            syn_data, _ = prepare_forecasting_dataset(
+                syn_df,
+                target_metric=target_metric,
+                horizon_steps=horizon_steps,
+                max_gap_seconds=max_gap_seconds,
+            )
+            if "split" in syn_data.columns and (syn_data["split"] == "test").any():
+                syn_test_df = syn_data[syn_data["split"] == "test"].copy()
+            else:
+                syn_test_df = syn_data.copy()
+
+            if len(syn_test_df) >= 20 and all(f in syn_test_df.columns for f in feature_names):
+                X_syn_test = syn_test_df[feature_names]
+                y_syn_test = syn_test_df["future_target"]
+                syn_preds = best_pipeline.predict(X_syn_test)
+
+                syn_mae = float(mean_absolute_error(y_syn_test, syn_preds))
+                syn_rmse = float(np.sqrt(mean_squared_error(y_syn_test, syn_preds)))
+                syn_r2 = float(r2_score(y_syn_test, syn_preds))
+                syn_mape = float(np.mean(np.abs((y_syn_test - syn_preds) / y_syn_test)) * 100.0)
+                syn_forecast_acc = max(0.0, 100.0 - syn_mape)
+
+                stress_eval_df = pd.DataFrame([
+                    {
+                        "condition": "Observed Telemetry (Normal Operation)",
+                        "model": best_name,
+                        "samples": len(test_df),
+                        "mae": best_eval["mae"],
+                        "rmse": best_eval["rmse"],
+                        "r2_score": best_eval["r2_score"],
+                        "mape_percent": best_eval["mape_percent"],
+                        "forecast_accuracy_pct": best_eval.get("forecast_accuracy_pct", round(max(0.0, 100.0 - best_eval["mape_percent"]), 2)),
+                    },
+                    {
+                        "condition": "Synthetic Fault Scenarios (Thermal/Fan/Power Faults)",
+                        "model": best_name,
+                        "samples": len(syn_test_df),
+                        "mae": round(syn_mae, 4),
+                        "rmse": round(syn_rmse, 4),
+                        "r2_score": round(syn_r2, 4),
+                        "mape_percent": round(syn_mape, 3),
+                        "forecast_accuracy_pct": round(syn_forecast_acc, 2),
+                    }
+                ])
+                stress_eval_df.to_csv(output_dir / "synthetic_fault_temperature_forecast_evaluation.csv", index=False)
+                print("\nFORECAST EVALUATION ACROSS FAULT CONDITIONS (OBSERVED vs SYNTHETIC FAULT SCENARIOS):")
+                print(stress_eval_df.to_string(index=False))
+        except Exception as exc:
+            print(f"Notice: Synthetic fault forecasting benchmark skipped: {exc}")
 
     print("Saved temperature_forecast_evaluation.csv, future_temperature_predictions.csv,")
     print("standardized_prediction_record.json, standardized_temperature_predictions.csv,")
@@ -1439,6 +1575,129 @@ def plot_forecast_results(test_df, eval_metrics, output_dir, target_metric, hori
 
     fig.savefig(output_dir / "future_temperature_forecast.png", dpi=180)
     plt.close(fig)
+
+
+def train_and_evaluate_power_thermal_health_model(
+    df,
+    output_dir,
+    synthetic_input=None,
+):
+    """
+    Supervised Power-Thermal Operational Health & Anomaly Classifier.
+    Trains classifiers (HistGradientBoosting, RandomForest) to predict anomaly_label
+    and operational degradation from correlated power and thermal multi-sensor telemetry.
+    """
+    if "anomaly_label" not in df.columns or df["anomaly_label"].notna().sum() < 20:
+        print("\nNotice: Supervised operational health model skipped ('anomaly_label' not available in dataframe).")
+        return
+
+    print("\n" + "=" * 50)
+    print("TRAINING SUPERVISED POWER-THERMAL HEALTH CLASSIFIER")
+    print("=" * 50)
+
+    # Base feature set: power metrics, thermal metrics, ambient, delta
+    sensor_cols = [c for c in ["total_power", "p0_power", "p1_power", "ps0_input_power", "ps1_input_power",
+                               "p0_vdd_temp", "p1_vdd_temp", "ambient", "fan0_0", "fan1_0"] if c in df.columns]
+
+    work = df[sensor_cols].copy()
+    if "p0_vdd_temp" in df.columns and "p1_vdd_temp" in df.columns:
+        work["processor_temp_diff"] = df["p0_vdd_temp"] - df["p1_vdd_temp"]
+    if "total_power" in df.columns and "p0_power" in df.columns and "p1_power" in df.columns:
+        work["cpu_power_ratio"] = (df["p0_power"] + df["p1_power"]) / (df["total_power"] + 1e-5)
+
+    # Valid mask for labels
+    valid_mask = df["anomaly_label"].notna()
+    if "label_valid" in df.columns:
+        valid_mask = valid_mask & (df["label_valid"] == 1)
+
+    X_valid = work.loc[valid_mask].replace([np.inf, -np.inf], np.nan)
+    y_valid = df.loc[valid_mask, "anomaly_label"].astype(int)
+
+    if "split" in df.columns and (df.loc[valid_mask, "split"] == "train").any() and (df.loc[valid_mask, "split"] == "test").any():
+        tr_mask = df.loc[valid_mask, "split"] == "train"
+        te_mask = df.loc[valid_mask, "split"] == "test"
+    else:
+        n_tot = len(X_valid)
+        tr_mask = pd.Series(False, index=X_valid.index)
+        te_mask = pd.Series(False, index=X_valid.index)
+        tr_mask.iloc[:int(n_tot * 0.8)] = True
+        te_mask.iloc[int(n_tot * 0.8):] = True
+
+    X_tr, y_tr = X_valid[tr_mask], y_valid[tr_mask]
+    X_te, y_te = X_valid[te_mask], y_valid[te_mask]
+
+    models = {
+        "HistGradientBoostingClassifier": HistGradientBoostingClassifier(
+            max_iter=100, max_depth=5, learning_rate=0.08, class_weight="balanced", random_state=RANDOM_STATE
+        ),
+        "RandomForestClassifier": RandomForestClassifier(
+            n_estimators=100, max_depth=8, min_samples_leaf=3, class_weight="balanced_subsample", random_state=RANDOM_STATE, n_jobs=-1
+        ),
+    }
+
+    best_clf = None
+    best_name = None
+    best_f1 = -1.0
+    records = []
+
+    for name, clf in models.items():
+        pipeline = Pipeline([
+            ("imputer", SimpleImputer(strategy="median")),
+            ("scaler", StandardScaler()),
+            ("classifier", clf),
+        ])
+        pipeline.fit(X_tr, y_tr)
+        test_probs = pipeline.predict_proba(X_te)[:, 1]
+        test_preds = (test_probs >= 0.5).astype(int)
+
+        acc = accuracy_score(y_te, test_preds)
+        prec = precision_score(y_te, test_preds, zero_division=0)
+        rec = recall_score(y_te, test_preds, zero_division=0)
+        f1 = f1_score(y_te, test_preds, zero_division=0)
+        pr_auc = average_precision_score(y_te, test_probs) if y_te.sum() > 0 else 0.0
+        try:
+            roc_auc = roc_auc_score(y_te, test_probs) if len(np.unique(y_te)) > 1 else np.nan
+        except Exception:
+            roc_auc = np.nan
+
+        records.append({
+            "model": name,
+            "test_samples": len(y_te),
+            "positives": int(y_te.sum()),
+            "accuracy": round(acc, 4),
+            "accuracy_pct": round(acc * 100.0, 2),
+            "precision": round(prec, 4),
+            "recall": round(rec, 4),
+            "f1_score": round(f1, 4),
+            "pr_auc": round(pr_auc, 4),
+            "roc_auc": round(roc_auc, 4) if np.isfinite(roc_auc) else np.nan,
+        })
+
+        if f1 > best_f1 or best_clf is None:
+            best_f1 = f1
+            best_clf = pipeline
+            best_name = name
+
+    eval_df = pd.DataFrame(records)
+    eval_df.to_csv(output_dir / "power_thermal_health_evaluation.csv", index=False)
+    print("\nPOWER-THERMAL HEALTH CLASSIFICATION EVALUATION (TEST PARTITION):")
+    print(eval_df.to_string(index=False))
+
+    # Full predictions
+    full_probs = best_clf.predict_proba(work.replace([np.inf, -np.inf], np.nan))[:, 1]
+    pred_df = pd.DataFrame({
+        "timestamp": df["timestamp"],
+        "anomaly_label": df["anomaly_label"] if "anomaly_label" in df.columns else (full_probs >= 0.5).astype(int),
+        "predicted_anomaly_probability": np.round(full_probs, 4),
+        "predicted_operational_status": np.where(full_probs >= 0.5, "degraded_anomalous", "healthy_normal"),
+    })
+    for m in ["total_power", "p0_vdd_temp", "p1_vdd_temp"]:
+        if m in df.columns:
+            pred_df[m] = df[m].to_numpy()
+
+    pred_df.to_csv(output_dir / "power_thermal_health_predictions.csv", index=False)
+    joblib.dump(best_clf, output_dir / "power_thermal_health_model.joblib")
+    print("Saved power_thermal_health_evaluation.csv, power_thermal_health_predictions.csv, and power_thermal_health_model.joblib")
 
 
 # ============================================================
@@ -1564,6 +1823,15 @@ def main():
         horizon_minutes=args.forecast_horizon_minutes,
         asset_id=args.asset_id,
         max_gap_seconds=args.max_gap_seconds,
+        synthetic_input=args.synthetic_input,
+    )
+
+    # 6.8 — Supervised Power-Thermal Operational Health & Anomaly Classifier
+    print("\n[6.8] Supervised Power-Thermal Health Classification...")
+    train_and_evaluate_power_thermal_health_model(
+        df=df,
+        output_dir=output_dir,
+        synthetic_input=args.synthetic_input,
     )
 
     # Additional preserved domain diagnostics
@@ -1571,10 +1839,105 @@ def main():
     analyze_processor_temperature_difference(df, output_dir)
     analyze_fan_trends(df, output_dir)
 
+    # Consolidated Master Model Evaluation Metrics Table
+    save_consolidated_evaluation_metrics(output_dir)
+
     print("\n" + "=" * 60)
     print("MODULE 6 ANALYTICS PIPELINE SUCCESSFULLY COMPLETED")
     print(f"All generated outputs and artifacts are located in: {output_dir.resolve()}")
     print("=" * 60)
+
+
+def save_consolidated_evaluation_metrics(output_dir):
+    """
+    Consolidates all power and temperature analytics model evaluation metrics
+    into a single structured evaluation table and saves as all_model_evaluation_metrics.csv.
+    """
+    output_dir = Path(output_dir)
+    master_records = []
+
+    # 1. Temperature Forecast Evaluation
+    fc_file = output_dir / "temperature_forecast_evaluation.csv"
+    if fc_file.exists():
+        fc_df = pd.read_csv(fc_file)
+        for _, row in fc_df.iterrows():
+            master_records.append({
+                "module": "power_temperature_analytics",
+                "model_name": row.get("model", "Unknown"),
+                "task_type": "Regression / Forecasting",
+                "target_variable": f"{row.get('target_metric', 'p0_vdd_temp')} ({row.get('horizon_minutes', 5):.0f}min)",
+                "condition": "Observed Telemetry (Test Set)",
+                "test_samples": row.get("test_samples", np.nan),
+                "accuracy_pct": row.get("forecast_accuracy_pct", np.nan),
+                "mae": row.get("mae", np.nan),
+                "rmse": row.get("rmse", np.nan),
+                "r2_score": row.get("r2_score", np.nan),
+                "mape_pct": row.get("mape_percent", np.nan),
+                "precision": np.nan,
+                "recall": np.nan,
+                "f1_score": np.nan,
+                "pr_auc": np.nan,
+                "roc_auc": np.nan,
+            })
+
+    # 2. Synthetic Fault Forecast Benchmark
+    syn_fc_file = output_dir / "synthetic_fault_temperature_forecast_evaluation.csv"
+    if syn_fc_file.exists():
+        syn_df = pd.read_csv(syn_fc_file)
+        for _, row in syn_df.iterrows():
+            if "Synthetic Fault Scenarios" in str(row.get("condition", "")):
+                master_records.append({
+                    "module": "power_temperature_analytics",
+                    "model_name": f"{row.get('model', 'Unknown')}_StressTest",
+                    "task_type": "Regression / Forecasting Under Stress",
+                    "target_variable": "p0_vdd_temp (5min)",
+                    "condition": "Synthetic Fault Scenarios (Stress Test)",
+                    "test_samples": row.get("samples", np.nan),
+                    "accuracy_pct": row.get("forecast_accuracy_pct", np.nan),
+                    "mae": row.get("mae", np.nan),
+                    "rmse": row.get("rmse", np.nan),
+                    "r2_score": row.get("r2_score", np.nan),
+                    "mape_pct": row.get("mape_percent", np.nan),
+                    "precision": np.nan,
+                    "recall": np.nan,
+                    "f1_score": np.nan,
+                    "pr_auc": np.nan,
+                    "roc_auc": np.nan,
+                })
+
+    # 3. Supervised Power-Thermal Health Classification
+    health_file = output_dir / "power_thermal_health_evaluation.csv"
+    if health_file.exists():
+        h_df = pd.read_csv(health_file)
+        for _, row in h_df.iterrows():
+            master_records.append({
+                "module": "power_temperature_analytics",
+                "model_name": row.get("model", "Unknown"),
+                "task_type": "Binary Operational Health Classification",
+                "target_variable": "anomaly_label",
+                "condition": "Observed Telemetry (Test Set)",
+                "test_samples": row.get("test_samples", np.nan),
+                "accuracy_pct": row.get("accuracy_pct", np.nan),
+                "mae": np.nan,
+                "rmse": np.nan,
+                "r2_score": np.nan,
+                "mape_pct": np.nan,
+                "precision": row.get("precision", np.nan),
+                "recall": row.get("recall", np.nan),
+                "f1_score": row.get("f1_score", np.nan),
+                "pr_auc": row.get("pr_auc", np.nan),
+                "roc_auc": row.get("roc_auc", np.nan),
+            })
+
+    if master_records:
+        all_metrics_df = pd.DataFrame(master_records)
+        all_metrics_path = output_dir / "all_model_evaluation_metrics.csv"
+        all_metrics_df.to_csv(all_metrics_path, index=False)
+        print("\n" + "=" * 60)
+        print(f"CONSOLIDATED POWER & TEMPERATURE EVALUATION TABLE:")
+        print(f"Saved: {all_metrics_path}")
+        print("=" * 60)
+        print(all_metrics_df[["model_name", "task_type", "target_variable", "accuracy_pct", "f1_score", "mae", "r2_score"]].to_string(index=False))
 
 
 if __name__ == "__main__":
