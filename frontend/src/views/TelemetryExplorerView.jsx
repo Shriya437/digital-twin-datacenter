@@ -1,18 +1,23 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import MetricCard from '../components/MetricCard';
 import ChartPanel from '../components/ChartPanel';
 import StatusBadge from '../components/StatusBadge';
 import { useTelemetry } from '../hooks/useTelemetry';
+import { apiClient } from '../api/client';
 
 /**
  * TelemetryExplorerView Component
  * Raw telemetry time-series inspector, multi-channel comparison,
- * and tabular dataset browser for Marconi-100 hardware nodes.
+ * and tabular dataset browser with multiclass fault categorization.
  */
 export default function TelemetryExplorerView() {
   const [historyLimit, setHistoryLimit] = useState(50);
   const [selectedChannel, setSelectedChannel] = useState('temp_core_max');
   const [searchTerm, setSearchTerm] = useState('');
+  const [dataSource, setDataSource] = useState('observed'); // 'observed' | 'synthetic' | 'all'
+  const [classFilter, setClassFilter] = useState('all');
+  const [syntheticRecords, setSyntheticRecords] = useState([]);
+  const [synLoading, setSynLoading] = useState(false);
 
   // Fetch actual continuous telemetry history from backend
   const { history, latestTelemetry, loading, error, refetch } = useTelemetry({
@@ -20,6 +25,26 @@ export default function TelemetryExplorerView() {
     historyLimit,
     nodeId: 'node1'
   });
+
+  // Fetch synthetic scenarios when requested
+  useEffect(() => {
+    if (dataSource === 'synthetic' || dataSource === 'all') {
+      let isMounted = true;
+      setSynLoading(true);
+      apiClient.get('/models/multiclass-predictions', {
+        params: { origin: dataSource === 'all' ? 'all' : 'synthetic', limit: historyLimit }
+      }).then((res) => {
+        if (isMounted) {
+          const recs = res.data?.records || [];
+          setSyntheticRecords(recs);
+          setSynLoading(false);
+        }
+      }).catch(() => {
+        if (isMounted) setSynLoading(false);
+      });
+      return () => { isMounted = false; };
+    }
+  }, [dataSource, historyLimit]);
 
   const channels = [
     { id: 'temp_core_max', label: 'Core Temp Max (°C)', unit: '°C', color: '#00f2fe' },
@@ -36,7 +61,6 @@ export default function TelemetryExplorerView() {
       .map((row) => {
         let val = row[selectedChannel];
         if (typeof val !== 'number') {
-          // Fallback field aliases
           if (selectedChannel === 'total_power') val = row.power;
           if (selectedChannel === 'temp_core_max') val = row.temperature;
         }
@@ -52,16 +76,54 @@ export default function TelemetryExplorerView() {
       .filter((pt) => pt.value !== null);
   }, [history, selectedChannel]);
 
-  // Filter table rows by search term (timestamp or status)
+  // Combine records based on dataSource selection
+  const activeRecords = useMemo(() => {
+    if (dataSource === 'synthetic') {
+      return syntheticRecords.map((r) => ({
+        ...r,
+        temp_core_max: r.p0_vdd_temp,
+        power: r.total_power,
+        fan_rpm: r.fan0_0,
+        inlet_temp: r.ambient,
+        is_anomaly: r.predicted_class !== 'normal'
+      }));
+    }
+    if (dataSource === 'all') {
+      const synMapped = syntheticRecords.map((r) => ({
+        ...r,
+        temp_core_max: r.p0_vdd_temp,
+        power: r.total_power,
+        fan_rpm: r.fan0_0,
+        inlet_temp: r.ambient,
+        is_anomaly: r.predicted_class !== 'normal'
+      }));
+      return [...history, ...synMapped];
+    }
+    return history;
+  }, [dataSource, history, syntheticRecords]);
+
+  // Filter table rows by search term and classFilter
   const filteredRecords = useMemo(() => {
-    if (!searchTerm.trim()) return history;
-    const term = searchTerm.toLowerCase();
-    return history.filter((r) => {
-      const ts = String(r.timestamp || '').toLowerCase();
-      const status = r.is_anomaly ? 'anomaly' : 'normal';
-      return ts.includes(term) || status.includes(term);
-    });
-  }, [history, searchTerm]);
+    let list = activeRecords;
+    if (classFilter !== 'all') {
+      list = list.filter((r) => {
+        const cls = String(r.predicted_class || (r.is_anomaly ? 'anomaly' : 'normal')).toLowerCase();
+        return cls === classFilter.toLowerCase();
+      });
+    }
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      list = list.filter((r) => {
+        const ts = String(r.timestamp || '').toLowerCase();
+        const status = r.is_anomaly ? 'anomaly' : 'normal';
+        const pClass = String(r.predicted_class || '').toLowerCase();
+        const origin = String(r.data_origin || (r.is_simulated ? 'simulated' : 'observed')).toLowerCase();
+        const scId = String(r.scenario_id || '').toLowerCase();
+        return ts.includes(term) || status.includes(term) || pClass.includes(term) || origin.includes(term) || scId.includes(term);
+      });
+    }
+    return list;
+  }, [activeRecords, searchTerm, classFilter]);
 
   // Compute empirical stats over current window
   const summaryStats = useMemo(() => {
@@ -279,84 +341,197 @@ export default function TelemetryExplorerView() {
           gap: '14px'
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '13px', fontWeight: 600, color: '#f8fafc' }}>
               Dataset Observation Ledger
             </span>
-            <span style={{ fontSize: '11px', color: '#64748b', marginLeft: '8px' }}>
+            <span style={{ fontSize: '11px', color: '#64748b' }}>
               ({filteredRecords.length} records in buffer)
             </span>
+
+            {/* Data Source Selector */}
+            <div style={{ display: 'inline-flex', background: 'rgba(30, 41, 59, 0.6)', borderRadius: '6px', padding: '2px', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
+              <button
+                onClick={() => setDataSource('observed')}
+                style={{
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  border: 'none',
+                  cursor: 'pointer',
+                  backgroundColor: dataSource === 'observed' ? 'rgba(6, 182, 212, 0.25)' : 'transparent',
+                  color: dataSource === 'observed' ? '#22d3ee' : '#94a3b8'
+                }}
+              >
+                ● Observed Telemetry
+              </button>
+              <button
+                onClick={() => setDataSource('synthetic')}
+                style={{
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  border: 'none',
+                  cursor: 'pointer',
+                  backgroundColor: dataSource === 'synthetic' ? 'rgba(139, 92, 246, 0.25)' : 'transparent',
+                  color: dataSource === 'synthetic' ? '#a78bfa' : '#94a3b8'
+                }}
+              >
+                ★ Synthetic Scenarios
+              </button>
+              <button
+                onClick={() => setDataSource('all')}
+                style={{
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  border: 'none',
+                  cursor: 'pointer',
+                  backgroundColor: dataSource === 'all' ? 'rgba(56, 189, 248, 0.25)' : 'transparent',
+                  color: dataSource === 'all' ? '#38bdf8' : '#94a3b8'
+                }}
+              >
+                All Records
+              </button>
+            </div>
           </div>
 
-          {/* Search Box */}
-          <input
-            type="text"
-            placeholder="Search timestamp or status..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              backgroundColor: 'rgba(30, 41, 59, 0.7)',
-              color: '#cbd5e1',
-              border: '1px solid rgba(56, 189, 248, 0.25)',
-              borderRadius: '6px',
-              padding: '6px 12px',
-              fontSize: '11px',
-              outline: 'none',
-              width: '220px'
-            }}
-          />
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+            {/* Class Filter Dropdown */}
+            <select
+              value={classFilter}
+              onChange={(e) => setClassFilter(e.target.value)}
+              style={{
+                backgroundColor: 'rgba(30, 41, 59, 0.7)',
+                color: '#cbd5e1',
+                border: '1px solid rgba(56, 189, 248, 0.25)',
+                borderRadius: '6px',
+                padding: '6px 10px',
+                fontSize: '11px',
+                outline: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="all">All Fault Categories</option>
+              <option value="normal">Normal</option>
+              <option value="thermal_anomaly">Thermal Anomaly</option>
+              <option value="fan_performance_anomaly">Fan Performance Anomaly</option>
+              <option value="power_anomaly">Power Anomaly</option>
+              <option value="combined_anomaly">Combined Anomaly</option>
+            </select>
+
+            {/* Search Box */}
+            <input
+              type="text"
+              placeholder="Search timestamp, class, origin..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                backgroundColor: 'rgba(30, 41, 59, 0.7)',
+                color: '#cbd5e1',
+                border: '1px solid rgba(56, 189, 248, 0.25)',
+                borderRadius: '6px',
+                padding: '6px 12px',
+                fontSize: '11px',
+                outline: 'none',
+                width: '180px'
+              }}
+            />
+          </div>
         </div>
 
-        {/* Observation Table */}
-        <div style={{ overflowX: 'auto', maxHeight: '340px' }}>
+        {/* Observation Table with Multiclass Classification */}
+        <div style={{ overflowX: 'auto', maxHeight: '380px' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid rgba(51, 65, 85, 0.6)', color: '#94a3b8', position: 'sticky', top: 0, backgroundColor: 'rgba(15, 23, 42, 0.95)' }}>
+              <tr style={{ borderBottom: '1px solid rgba(51, 65, 85, 0.6)', color: '#94a3b8', position: 'sticky', top: 0, backgroundColor: 'rgba(15, 23, 42, 0.95)', zIndex: 10 }}>
                 <th style={{ padding: '8px 12px' }}>Timestamp</th>
                 <th style={{ padding: '8px 12px' }}>Core Temp (°C)</th>
                 <th style={{ padding: '8px 12px' }}>Total Power (W)</th>
                 <th style={{ padding: '8px 12px' }}>Chassis Fan (RPM)</th>
                 <th style={{ padding: '8px 12px' }}>Inlet Ambient (°C)</th>
-                <th style={{ padding: '8px 12px' }}>Observation Status</th>
+                <th style={{ padding: '8px 12px' }}>Multiclass Classification</th>
+                <th style={{ padding: '8px 12px' }}>Confidence</th>
+                <th style={{ padding: '8px 12px' }}>Data Origin</th>
+                <th style={{ padding: '8px 12px' }}>Outlier Gate</th>
               </tr>
             </thead>
             <tbody>
               {filteredRecords.length === 0 ? (
                 <tr>
-                  <td colSpan="6" style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>
-                    {loading ? 'Streaming observations from dataset...' : 'No telemetry records match query.'}
+                  <td colSpan="9" style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>
+                    {loading || synLoading ? 'Streaming observations from dataset...' : 'No telemetry records match query.'}
                   </td>
                 </tr>
               ) : (
                 filteredRecords.map((r, idx) => {
-                  const coreTemp = r.temp_core_max ?? r.temperature;
+                  const coreTemp = r.temp_core_max ?? r.temperature ?? r.p0_vdd_temp;
                   const power = r.total_power ?? r.power;
+                  const fan = r.fan_rpm ?? r.fan0_0;
+                  const ambient = r.inlet_temp ?? r.ambient;
+                  const predClass = r.predicted_class || (r.is_anomaly ? 'thermal_anomaly' : 'normal');
+                  const conf = typeof r.confidence === 'number' ? (r.confidence * 100).toFixed(1) + '%' : '—';
+                  const isSim = Boolean(r.is_simulated || r.data_origin === 'synthetic');
+                  const originLabel = isSim ? 'SIMULATED' : 'OBSERVED';
+
                   return (
                     <tr
                       key={idx}
                       style={{
                         borderBottom: '1px solid rgba(51, 65, 85, 0.35)',
-                        backgroundColor: r.is_anomaly ? 'rgba(239, 68, 68, 0.08)' : 'transparent'
+                        backgroundColor: predClass !== 'normal'
+                          ? 'rgba(239, 68, 68, 0.08)'
+                          : isSim
+                          ? 'rgba(139, 92, 246, 0.04)'
+                          : 'transparent'
                       }}
                     >
-                      <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: '#cbd5e1' }}>
+                      <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: '#cbd5e1', fontSize: '11px' }}>
                         {r.timestamp || 'Recorded Sample'}
+                        {r.scenario_id && r.scenario_id !== 'observed_stream' && (
+                          <span style={{ display: 'block', fontSize: '10px', color: '#a78bfa' }}>
+                            {r.scenario_id}
+                          </span>
+                        )}
                       </td>
                       <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: '#00f2fe' }}>
-                        {typeof coreTemp === 'number' ? coreTemp.toFixed(1) : 'Unavailable'}
+                        {typeof coreTemp === 'number' ? Number(coreTemp).toFixed(1) : 'Unavailable'}
                       </td>
                       <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: '#38bdf8' }}>
-                        {typeof power === 'number' ? power.toFixed(1) : 'Unavailable'}
+                        {typeof power === 'number' ? Number(power).toFixed(1) : 'Unavailable'}
                       </td>
                       <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: '#34d399' }}>
-                        {r.fan_rpm != null ? r.fan_rpm : 'Unavailable'}
+                        {fan != null ? fan : 'Unavailable'}
                       </td>
                       <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: '#a855f7' }}>
-                        {r.inlet_temp != null ? `${Number(r.inlet_temp).toFixed(1)}` : 'Unavailable'}
+                        {ambient != null ? `${Number(ambient).toFixed(1)}` : 'Unavailable'}
                       </td>
                       <td style={{ padding: '8px 12px' }}>
-                        <StatusBadge status={r.is_anomaly ? 'ANOMALOUS' : 'NORMAL'} size="sm" />
+                        <StatusBadge
+                          status={predClass.toUpperCase()}
+                          label={predClass.replace(/_/g, ' ')}
+                          size="sm"
+                        />
+                      </td>
+                      <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: '#e2e8f0', fontSize: '11px' }}>
+                        {conf}
+                      </td>
+                      <td style={{ padding: '8px 12px' }}>
+                        <StatusBadge
+                          status={originLabel}
+                          label={originLabel}
+                          size="sm"
+                        />
+                      </td>
+                      <td style={{ padding: '8px 12px' }}>
+                        <StatusBadge
+                          status={r.is_anomaly ? 'ANOMALOUS' : 'NORMAL'}
+                          size="sm"
+                        />
                       </td>
                     </tr>
                   );

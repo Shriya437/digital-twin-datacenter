@@ -224,13 +224,27 @@ export default function AnomalyDetectionView() {
                           : 'Flagged'}
                       </td>
                       <td style={{ padding: '10px 12px', fontFamily: 'monospace', color: '#cbd5e1' }}>
-                        {typeof rec.total_power === 'number' ? `${rec.total_power.toFixed(1)}` : (rec.power || 'Unavailable')}
+                        {typeof rec.total_power === 'number'
+                          ? `${rec.total_power.toFixed(1)} W`
+                          : typeof rec.power === 'number'
+                          ? `${rec.power.toFixed(1)} W`
+                          : (rec.total_power || rec.power || '—')}
                       </td>
                       <td style={{ padding: '10px 12px', fontFamily: 'monospace', color: '#cbd5e1' }}>
-                        {typeof rec.temp_core_max === 'number' ? `${rec.temp_core_max.toFixed(1)}` : (rec.temperature || 'Unavailable')}
+                        {typeof rec.temp_core_max === 'number'
+                          ? `${rec.temp_core_max.toFixed(1)} °C`
+                          : typeof rec.p0_vdd_temp === 'number'
+                          ? `${rec.p0_vdd_temp.toFixed(1)} °C`
+                          : typeof rec.temperature === 'number'
+                          ? `${rec.temperature.toFixed(1)} °C`
+                          : (rec.temp_core_max || rec.p0_vdd_temp || '—')}
                       </td>
                       <td style={{ padding: '10px 12px', fontFamily: 'monospace', color: '#cbd5e1' }}>
-                        {rec.fan_rpm ?? 'Unavailable'}
+                        {typeof rec.fan_rpm === 'number'
+                          ? `${Math.round(rec.fan_rpm).toLocaleString()} RPM`
+                          : typeof rec.fan0_0 === 'number'
+                          ? `${Math.round(rec.fan0_0).toLocaleString()} RPM`
+                          : (rec.fan_rpm || rec.fan0_0 || '—')}
                       </td>
                       <td style={{ padding: '10px 12px' }}>
                         <StatusBadge status="ANOMALOUS" size="sm" />
@@ -249,30 +263,57 @@ export default function AnomalyDetectionView() {
             style={{
               marginTop: '12px',
               padding: '14px',
-              backgroundColor: 'rgba(30, 41, 59, 0.5)',
-              border: '1px solid rgba(56, 189, 248, 0.2)',
+              backgroundColor: 'rgba(30, 41, 59, 0.65)',
+              border: '1px solid rgba(56, 189, 248, 0.25)',
               borderRadius: '8px',
               fontSize: '12px'
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
               <span style={{ fontWeight: 600, color: '#38bdf8' }}>
-                Anomaly Feature Departure Evidence
+                Anomaly Feature Departure Evidence & Telemetry Snapshot
               </span>
               <button
                 onClick={() => setSelectedRecord(null)}
-                style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer' }}
+                style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '13px' }}
               >
                 ✕ Close
               </button>
             </div>
-            <p style={{ color: '#cbd5e1', lineHeight: 1.5, margin: 0 }}>
-              Observation at <strong>{filteredAnomalies[selectedRecord].timestamp}</strong> was flagged with score{' '}
+            <p style={{ color: '#cbd5e1', lineHeight: 1.5, margin: '0 0 10px 0' }}>
+              Observation at <strong>{filteredAnomalies[selectedRecord].timestamp}</strong> was flagged by detector{' '}
+              <strong style={{ color: '#38bdf8' }}>{filteredAnomalies[selectedRecord].detector || filteredAnomalies[selectedRecord].method}</strong> with anomaly score{' '}
               <strong style={{ color: '#f87171' }}>
                 {filteredAnomalies[selectedRecord].anomaly_score ?? filteredAnomalies[selectedRecord].score}
               </strong>
-              . Multidimensional sensor relationship diverged from nominal training distribution.
+              {filteredAnomalies[selectedRecord].threshold ? ` (decision boundary: ${Number(filteredAnomalies[selectedRecord].threshold).toFixed(2)})` : ''}.
             </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '8px' }}>
+              <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '6px 10px', borderRadius: '4px' }}>
+                <div style={{ color: '#94a3b8', fontSize: '10px' }}>TOTAL POWER</div>
+                <div style={{ color: '#00f2fe', fontWeight: 600, fontFamily: 'monospace' }}>
+                  {filteredAnomalies[selectedRecord].total_power ?? filteredAnomalies[selectedRecord].power ?? '—'} W
+                </div>
+              </div>
+              <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '6px 10px', borderRadius: '4px' }}>
+                <div style={{ color: '#94a3b8', fontSize: '10px' }}>CORE TEMP (P0 / P1)</div>
+                <div style={{ color: '#f87171', fontWeight: 600, fontFamily: 'monospace' }}>
+                  {filteredAnomalies[selectedRecord].p0_vdd_temp ?? filteredAnomalies[selectedRecord].temp_core_max ?? '—'}°C / {filteredAnomalies[selectedRecord].p1_vdd_temp ?? '—'}°C
+                </div>
+              </div>
+              <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '6px 10px', borderRadius: '4px' }}>
+                <div style={{ color: '#94a3b8', fontSize: '10px' }}>FAN TACHOMETERS</div>
+                <div style={{ color: '#34d399', fontWeight: 600, fontFamily: 'monospace' }}>
+                  {filteredAnomalies[selectedRecord].fan0_0 ?? filteredAnomalies[selectedRecord].fan_rpm ?? '—'} / {filteredAnomalies[selectedRecord].fan1_0 ?? '—'} RPM
+                </div>
+              </div>
+              <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '6px 10px', borderRadius: '4px' }}>
+                <div style={{ color: '#94a3b8', fontSize: '10px' }}>AMBIENT AIR</div>
+                <div style={{ color: '#cbd5e1', fontWeight: 600, fontFamily: 'monospace' }}>
+                  {filteredAnomalies[selectedRecord].ambient ? `${filteredAnomalies[selectedRecord].ambient}°C` : '—'}
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

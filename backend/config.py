@@ -31,7 +31,13 @@ GAP_REPORT_USED_CSV = OUTPUTS_DIR / "timestamp_gap_report_used.csv"
 FAULT_IMPACT_JSON = FAULT_PROP_DIR / "fault_impact_report.json"
 FAULT_IMPACT_CSV = FAULT_PROP_DIR / "fault_impact_report.csv"
 FAULT_SCENARIOS_CSV = FAULT_PROP_DIR / "fault_propagation_scenarios.csv"
+INTEGRATED_FAULT_JSON = FAULT_PROP_DIR / "integrated_fault_workflow.json"
+SCENARIO_IMPACT_MATRIX_JSON = FAULT_PROP_DIR / "scenario_impact_matrix.json"
 ENERGY_ANALYSIS_CSV = FAULT_PROP_DIR / "energy_analysis.csv"
+
+# Multiclass predictions and labeling outputs
+MULTICLASS_PRED_CSV = OUTPUTS_DIR / "multiclass_predictions.csv"
+MULTICLASS_MODEL_JOBLIB = OUTPUTS_DIR / "multiclass_fault_classifier.joblib"
 
 # Predictive maintenance outputs
 PRED_WARNINGS_CSV = PRED_MAINT_DIR / "future_temperature_warnings.csv"
@@ -40,6 +46,7 @@ DEGRADATION_CSV = PRED_MAINT_DIR / "degradation_indicators.csv"
 FORECAST_METRICS_CSV = PRED_MAINT_DIR / "forecast_metrics.csv"
 STANDARDIZED_PRED_CSV = PRED_MAINT_DIR / "standardized_predictions.csv"
 ANOMALY_RESULTS_CSV = PRED_MAINT_DIR / "anomaly_detection_results.csv"
+ALL_MODEL_EVALUATION_CSV = PRED_MAINT_DIR / "all_model_evaluation_metrics.csv"
 
 # Member 3 outputs
 ENERGY_SUMMARY_CSV = MEMBER3_DIR / "energy_integration_summary.csv"

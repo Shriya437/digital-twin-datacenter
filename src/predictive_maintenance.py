@@ -5,7 +5,7 @@ Data Center Digital Twin
 Features:
 1. Temperature forecasting
 2. Persistence baseline comparison
-3. Random Forest and HistGradientBoosting models
+3. Ridge Regression and Gradient Boosting regression models
 4. Forecast evaluation using MAE, RMSE and R2
 5. Standardized prediction output
 6. Degradation indicators
@@ -19,17 +19,19 @@ from pathlib import Path
 import warnings
 
 import joblib
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 from sklearn.ensemble import (
-    RandomForestRegressor,
-    HistGradientBoostingRegressor,
+    GradientBoostingRegressor,
     IsolationForest,
     RandomForestClassifier,
     HistGradientBoostingClassifier,
 )
+from sklearn.linear_model import Ridge
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import (
     accuracy_score,
@@ -387,40 +389,32 @@ def create_features(df, available_metrics):
 # ============================================================
 
 def create_model(model_name):
-    """Create a forecasting model with median imputation."""
+    """Create a temperature forecasting model with median imputation."""
 
-    if model_name == "RandomForest":
-
-        estimator = RandomForestRegressor(
-            n_estimators=35,
-            max_depth=12,
-            min_samples_leaf=2,
-            random_state=RANDOM_STATE,
-            n_jobs=-1,
-        )
-
-    elif model_name == "HistGradientBoosting":
-
-        estimator = HistGradientBoostingRegressor(
-            max_iter=60,
-            max_leaf_nodes=15,
-            random_state=RANDOM_STATE,
-        )
-
-    else:
-        raise ValueError(
-            f"Unknown model: {model_name}"
-        )
-
-    return Pipeline(
-        steps=[
-            (
-                "imputer",
-                SimpleImputer(strategy="median"),
-            ),
+    if model_name == "Ridge":
+        estimator = Ridge(alpha=1.0)
+        steps = [
+            ("imputer", SimpleImputer(strategy="median")),
+            ("scaler", StandardScaler()),
             ("model", estimator),
         ]
-    )
+
+    elif model_name == "GradientBoosting":
+        estimator = GradientBoostingRegressor(
+            n_estimators=100,
+            learning_rate=0.05,
+            max_depth=3,
+            random_state=RANDOM_STATE,
+        )
+        steps = [
+            ("imputer", SimpleImputer(strategy="median")),
+            ("model", estimator),
+        ]
+
+    else:
+        raise ValueError(f"Unknown model: {model_name}")
+
+    return Pipeline(steps=steps)
 
 
 def create_classifier(model_name, n_classes=2):
@@ -776,8 +770,8 @@ def run_forecast(
 
     # Train the candidate machine-learning models.
     for model_name in [
-        "RandomForest",
-        "HistGradientBoosting",
+        "Ridge",
+        "GradientBoosting",
     ]:
 
         try:

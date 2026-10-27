@@ -8,6 +8,7 @@ import { apiClient } from '../api/client';
  */
 export function useModelMetrics() {
   const [models, setModels] = useState([]);
+  const [evaluationLedger, setEvaluationLedger] = useState([]);
   const [overallPipelineStatus, setOverallPipelineStatus] = useState('UNKNOWN');
   const [dataReliabilityReport, setDataReliabilityReport] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -32,6 +33,9 @@ export function useModelMetrics() {
           ? evalData
           : (evalData.models || []);
         setOverallPipelineStatus(evalData.pipeline_status || 'HEALTHY');
+        if (evalData.evaluation_ledger && Array.isArray(evalData.evaluation_ledger)) {
+          setEvaluationLedger(evalData.evaluation_ledger);
+        }
       }
 
       if (relRes.status === 'fulfilled' && relRes.value?.data) {
@@ -68,6 +72,7 @@ export function useModelMetrics() {
 
   return {
     models,
+    evaluationLedger,
     overallPipelineStatus,
     dataReliabilityReport,
     loading,

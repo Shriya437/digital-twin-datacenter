@@ -46,16 +46,16 @@
       "n": 877,
       "positives": 62,
       "prevalence": 0.0707,
-      "threshold": 0.1856,
-      "precision": 0.072,
+      "threshold": 0.1821,
+      "precision": 0.068,
       "recall": 0.081,
-      "f1": 0.076,
+      "f1": 0.074,
       "pr_auc": 0.206,
-      "brier": 0.0684,
+      "brier": 0.0688,
       "confusion_matrix[[TN,FP],[FN,TP]]": [
         [
-          751,
-          64
+          747,
+          68
         ],
         [
           57,
@@ -69,24 +69,24 @@
       "n": 877,
       "positives": 62,
       "prevalence": 0.0707,
-      "threshold": 0.027,
-      "precision": 0.102,
-      "recall": 0.081,
-      "f1": 0.09,
-      "pr_auc": 0.239,
-      "brier": 0.1029,
+      "threshold": 0.0025,
+      "precision": 0.147,
+      "recall": 0.161,
+      "f1": 0.154,
+      "pr_auc": 0.229,
+      "brier": 0.1039,
       "confusion_matrix[[TN,FP],[FN,TP]]": [
         [
-          771,
-          44
+          757,
+          58
         ],
         [
-          57,
-          5
+          52,
+          10
         ]
       ],
-      "val_pr_auc": 0.065,
-      "brier_after_isotonic_val_calibration": 0.0665
+      "val_pr_auc": 0.052,
+      "brier_after_isotonic_val_calibration": 0.0659
     }
   },
   "T1b_observed_anomaly_label__WITH_rule_evidence_LEAKAGE_CHECK": {
@@ -136,24 +136,24 @@
       "n": 877,
       "positives": 62,
       "prevalence": 0.0707,
-      "threshold": 0.5493,
+      "threshold": 0.536,
       "precision": 1.0,
-      "recall": 0.21,
-      "f1": 0.347,
-      "pr_auc": 0.902,
-      "brier": 0.0273,
+      "recall": 0.242,
+      "f1": 0.39,
+      "pr_auc": 0.901,
+      "brier": 0.0278,
       "confusion_matrix[[TN,FP],[FN,TP]]": [
         [
           815,
           0
         ],
         [
-          49,
-          13
+          47,
+          15
         ]
       ],
-      "val_pr_auc": 0.267,
-      "brier_after_isotonic_val_calibration": 0.0146
+      "val_pr_auc": 0.268,
+      "brier_after_isotonic_val_calibration": 0.0147
     },
     "HistGB": {
       "n": 877,
@@ -161,8 +161,8 @@
       "prevalence": 0.0707,
       "threshold": 1.0,
       "precision": 1.0,
-      "recall": 0.597,
-      "f1": 0.747,
+      "recall": 0.79,
+      "f1": 0.883,
       "pr_auc": 0.908,
       "brier": 0.0092,
       "confusion_matrix[[TN,FP],[FN,TP]]": [
@@ -171,11 +171,11 @@
           0
         ],
         [
-          25,
-          37
+          13,
+          49
         ]
       ],
-      "val_pr_auc": 0.28,
+      "val_pr_auc": 0.281,
       "brier_after_isotonic_val_calibration": 0.0091
     }
   },
@@ -185,15 +185,15 @@
       "positives": 31,
       "prevalence": 0.0229,
       "threshold": 0.5,
-      "precision": 0.969,
+      "precision": 0.939,
       "recall": 1.0,
-      "f1": 0.984,
+      "f1": 0.969,
       "pr_auc": 0.996,
-      "brier": 0.0009,
+      "brier": 0.0012,
       "confusion_matrix[[TN,FP],[FN,TP]]": [
         [
-          1321,
-          1
+          1320,
+          2
         ],
         [
           0,
@@ -250,47 +250,47 @@
       "n": 682,
       "positives": 13,
       "prevalence": 0.0191,
-      "threshold": 0.003,
-      "precision": 0.058,
+      "threshold": 0.0033,
+      "precision": 0.075,
       "recall": 1.0,
-      "f1": 0.11,
-      "pr_auc": 0.061,
-      "brier": 0.0426,
+      "f1": 0.139,
+      "pr_auc": 0.06,
+      "brier": 0.0424,
       "confusion_matrix[[TN,FP],[FN,TP]]": [
         [
-          459,
-          210
+          508,
+          161
         ],
         [
           0,
           13
         ]
       ],
-      "val_pr_auc": 0.016,
-      "brier_after_isotonic_val_calibration": 0.0184
+      "val_pr_auc": 0.018,
+      "brier_after_isotonic_val_calibration": 0.0183
     },
     "HistGB": {
       "n": 682,
       "positives": 13,
       "prevalence": 0.0191,
       "threshold": 0.0,
-      "precision": 0.03,
+      "precision": 0.024,
       "recall": 1.0,
-      "f1": 0.059,
-      "pr_auc": 0.092,
-      "brier": 0.0526,
+      "f1": 0.046,
+      "pr_auc": 0.088,
+      "brier": 0.0529,
       "confusion_matrix[[TN,FP],[FN,TP]]": [
         [
-          252,
-          417
+          134,
+          535
         ],
         [
           0,
           13
         ]
       ],
-      "val_pr_auc": 0.019,
-      "brier_after_isotonic_val_calibration": 0.0185
+      "val_pr_auc": 0.015,
+      "brier_after_isotonic_val_calibration": 0.0186
     }
   },
   "T3_observed_fault_type_multiclass": {
@@ -385,7 +385,7 @@
       ]
     },
     "HistGB": {
-      "macro_f1_over_classes_present_in_test": 0.282,
+      "macro_f1_over_classes_present_in_test": 0.283,
       "per_class": {
         "combined_anomaly": {
           "precision": 0.0,
@@ -394,14 +394,14 @@
           "support": 43.0
         },
         "fan_performance_anomaly": {
-          "precision": 0.125,
+          "precision": 0.13,
           "recall": 0.3,
-          "f1-score": 0.176,
+          "f1-score": 0.182,
           "support": 10.0
         },
         "normal": {
-          "precision": 0.931,
-          "recall": 0.971,
+          "precision": 0.932,
+          "recall": 0.969,
           "f1-score": 0.95,
           "support": 815.0
         },
@@ -442,9 +442,9 @@
         ],
         [
           0,
-          21,
-          791,
-          3,
+          20,
+          790,
+          5,
           0
         ],
         [
@@ -457,8 +457,8 @@
         [
           0,
           0,
-          9,
-          0,
+          8,
+          1,
           0
         ]
       ],
@@ -522,47 +522,47 @@
       "n": 3320,
       "positives": 1496,
       "prevalence": 0.4506,
-      "threshold": 0.7156,
-      "precision": 0.929,
-      "recall": 0.757,
+      "threshold": 0.7215,
+      "precision": 0.938,
+      "recall": 0.75,
       "f1": 0.834,
-      "pr_auc": 0.949,
-      "brier": 0.0926,
+      "pr_auc": 0.953,
+      "brier": 0.0905,
       "confusion_matrix[[TN,FP],[FN,TP]]": [
         [
-          1737,
-          87
+          1750,
+          74
         ],
         [
-          363,
-          1133
+          374,
+          1122
         ]
       ],
-      "val_pr_auc": 0.937,
-      "brier_after_isotonic_val_calibration": 0.0947
+      "val_pr_auc": 0.941,
+      "brier_after_isotonic_val_calibration": 0.0909
     },
     "HistGB": {
       "n": 3320,
       "positives": 1496,
       "prevalence": 0.4506,
-      "threshold": 0.8903,
-      "precision": 0.936,
-      "recall": 0.805,
-      "f1": 0.865,
-      "pr_auc": 0.954,
-      "brier": 0.0673,
+      "threshold": 0.879,
+      "precision": 0.943,
+      "recall": 0.822,
+      "f1": 0.878,
+      "pr_auc": 0.961,
+      "brier": 0.065,
       "confusion_matrix[[TN,FP],[FN,TP]]": [
         [
-          1741,
-          83
+          1749,
+          75
         ],
         [
-          292,
-          1204
+          266,
+          1230
         ]
       ],
-      "val_pr_auc": 0.947,
-      "brier_after_isotonic_val_calibration": 0.0866
+      "val_pr_auc": 0.958,
+      "brier_after_isotonic_val_calibration": 0.0792
     }
   },
   "S2_synthetic_future_anomaly_next15_onset_subset": {
@@ -612,81 +612,81 @@
       "n": 1657,
       "positives": 240,
       "prevalence": 0.1448,
-      "threshold": 0.2742,
-      "precision": 0.273,
-      "recall": 0.2,
-      "f1": 0.231,
-      "pr_auc": 0.288,
-      "brier": 0.1193,
+      "threshold": 0.2967,
+      "precision": 0.358,
+      "recall": 0.163,
+      "f1": 0.223,
+      "pr_auc": 0.297,
+      "brier": 0.1197,
       "confusion_matrix[[TN,FP],[FN,TP]]": [
         [
-          1289,
-          128
+          1347,
+          70
         ],
         [
-          192,
-          48
+          201,
+          39
         ]
       ],
-      "val_pr_auc": 0.278,
-      "brier_after_isotonic_val_calibration": 0.1214
+      "val_pr_auc": 0.272,
+      "brier_after_isotonic_val_calibration": 0.122
     },
     "HistGB": {
       "n": 1657,
       "positives": 240,
       "prevalence": 0.1448,
-      "threshold": 0.2205,
-      "precision": 0.189,
-      "recall": 0.221,
-      "f1": 0.204,
-      "pr_auc": 0.188,
-      "brier": 0.1348,
+      "threshold": 0.2148,
+      "precision": 0.208,
+      "recall": 0.263,
+      "f1": 0.232,
+      "pr_auc": 0.19,
+      "brier": 0.1357,
       "confusion_matrix[[TN,FP],[FN,TP]]": [
         [
-          1190,
-          227
+          1177,
+          240
         ],
         [
-          187,
-          53
+          177,
+          63
         ]
       ],
-      "val_pr_auc": 0.233,
-      "brier_after_isotonic_val_calibration": 0.1258
+      "val_pr_auc": 0.25,
+      "brier_after_isotonic_val_calibration": 0.1259
     }
   },
   "S3_synthetic_fault_type_multiclass": {
     "RandomForest": {
-      "macro_f1_over_classes_present_in_test": 0.797,
+      "macro_f1_over_classes_present_in_test": 0.794,
       "per_class": {
         "combined_anomaly": {
-          "precision": 0.833,
-          "recall": 0.627,
-          "f1-score": 0.716,
+          "precision": 0.83,
+          "recall": 0.612,
+          "f1-score": 0.705,
           "support": 263.0
         },
         "fan_performance_anomaly": {
-          "precision": 0.877,
-          "recall": 0.859,
+          "precision": 0.873,
+          "recall": 0.863,
           "f1-score": 0.868,
           "support": 548.0
         },
         "normal": {
-          "precision": 0.892,
-          "recall": 0.927,
+          "precision": 0.891,
+          "recall": 0.928,
           "f1-score": 0.909,
           "support": 1824.0
         },
         "power_anomaly": {
-          "precision": 0.961,
-          "recall": 0.589,
-          "f1-score": 0.731,
+          "precision": 0.946,
+          "recall": 0.594,
+          "f1-score": 0.73,
           "support": 207.0
         },
         "thermal_anomaly": {
-          "precision": 0.703,
-          "recall": 0.828,
-          "f1-score": 0.761,
+          "precision": 0.709,
+          "recall": 0.82,
+          "f1-score": 0.76,
           "support": 478.0
         }
       },
@@ -699,39 +699,39 @@
       ],
       "confusion_matrix": [
         [
-          165,
-          59,
+          161,
+          61,
           8,
-          3,
+          5,
           28
         ],
         [
-          6,
-          471,
-          41,
-          0,
-          30
-        ],
-        [
-          21,
           7,
-          1691,
+          473,
+          37,
+          0,
+          31
+        ],
+        [
+          20,
+          8,
+          1693,
           2,
-          103
+          101
         ],
         [
-          3,
+          2,
           0,
-          76,
-          122,
-          6
+          81,
+          123,
+          1
         ],
         [
-          3,
+          4,
           0,
-          79,
+          82,
           0,
-          396
+          392
         ]
       ],
       "classes_in_train": [
@@ -753,33 +753,33 @@
       "macro_f1_over_classes_present_in_test": 0.759,
       "per_class": {
         "combined_anomaly": {
-          "precision": 0.567,
-          "recall": 0.437,
-          "f1-score": 0.494,
+          "precision": 0.554,
+          "recall": 0.43,
+          "f1-score": 0.484,
           "support": 263.0
         },
         "fan_performance_anomaly": {
-          "precision": 0.879,
+          "precision": 0.876,
           "recall": 0.865,
-          "f1-score": 0.872,
+          "f1-score": 0.871,
           "support": 548.0
         },
         "normal": {
-          "precision": 0.912,
-          "recall": 0.933,
-          "f1-score": 0.922,
+          "precision": 0.919,
+          "recall": 0.93,
+          "f1-score": 0.925,
           "support": 1824.0
         },
         "power_anomaly": {
-          "precision": 0.905,
-          "recall": 0.599,
-          "f1-score": 0.721,
+          "precision": 0.926,
+          "recall": 0.604,
+          "f1-score": 0.731,
           "support": 207.0
         },
         "thermal_anomaly": {
-          "precision": 0.72,
-          "recall": 0.868,
-          "f1-score": 0.787,
+          "precision": 0.706,
+          "recall": 0.879,
+          "f1-score": 0.783,
           "support": 478.0
         }
       },
@@ -792,39 +792,39 @@
       ],
       "confusion_matrix": [
         [
-          115,
+          113,
           58,
-          11,
-          9,
-          70
+          13,
+          6,
+          73
         ],
         [
           30,
           474,
-          35,
+          30,
           0,
-          9
+          14
         ],
         [
           33,
-          7,
-          1701,
+          9,
+          1696,
           4,
-          79
+          82
         ],
         [
-          23,
+          27,
+          0,
+          49,
+          125,
+          6
+        ],
+        [
+          1,
           0,
           57,
-          124,
-          3
-        ],
-        [
-          2,
           0,
-          61,
-          0,
-          415
+          420
         ]
       ],
       "classes_in_train": [
@@ -848,16 +848,16 @@
       "n": 877,
       "positives": 62,
       "prevalence": 0.0707,
-      "threshold": 0.8903,
-      "precision": 0.457,
+      "threshold": 0.879,
+      "precision": 0.487,
       "recall": 0.597,
-      "f1": 0.517,
-      "pr_auc": 0.499,
-      "brier": 0.0797,
+      "f1": 0.536,
+      "pr_auc": 0.561,
+      "brier": 0.0804,
       "confusion_matrix[[TN,FP],[FN,TP]]": [
         [
-          771,
-          44
+          776,
+          39
         ],
         [
           25,

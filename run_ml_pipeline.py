@@ -12,7 +12,8 @@ STEPS = [
     ([sys.executable, "-m", "src.main"], "Core data, anomaly detection, root-cause and graph pipeline"),
     ([sys.executable, "-m", "src.predictive_maintenance"], "Forecasting, Isolation Forest, degradation and warnings"),
     ([sys.executable, "src/power_temperature_analytics.py", "--output-dir", "outputs/member3_outputs"], "Energy integration, correlations and temperature forecasting"),
-    ([sys.executable, "src/fault_propogation.py"], "Graph-based fault impact analysis"),
+    ([sys.executable, "data/m100_labeling/ml_labeling/train_baselines.py", "--data-dir", "data/m100_labeling/outputs/labeled_dataset"], "Multiclass fault classification & row-level prediction sync"),
+    ([sys.executable, "src/fault_propogation.py"], "Graph-based fault impact analysis & scenario connection"),
 ]
 
 for command, label in STEPS:

@@ -7,7 +7,7 @@ import { useTelemetry } from '../hooks/useTelemetry';
 
 /**
  * ForecastingView Component
- * Dedicated analysis view for trained regression models (Ridge & Random Forest).
+ * Dedicated analysis view for trained regression models (Ridge & Gradient Boosting).
  * Visualizes observed telemetry vs future prediction horizon with true evaluation metrics.
  */
 export default function ForecastingView() {
@@ -39,8 +39,8 @@ export default function ForecastingView() {
         value: typeof row.temp_core_max === 'number'
           ? row.temp_core_max
           : typeof row.temperature === 'number'
-          ? row.temperature
-          : null,
+            ? row.temperature
+            : null,
         is_anomaly: Boolean(row.is_anomaly)
       }))
       .filter((pt) => pt.value !== null);
@@ -92,20 +92,20 @@ export default function ForecastingView() {
 
   const latestPredicted = forecasts.length > 0
     ? (typeof forecasts[0].predicted_temp === 'number'
-        ? forecasts[0].predicted_temp.toFixed(1)
-        : typeof forecasts[0].prediction === 'number'
+      ? forecasts[0].predicted_temp.toFixed(1)
+      : typeof forecasts[0].prediction === 'number'
         ? forecasts[0].prediction.toFixed(1)
         : 'Unavailable')
     : '32.8';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      
+
       {/* Header and Filter Controls */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <h2 className="gradient-text-aurora" style={{ margin: 0, fontSize: '18px', color: '#f8fafc', fontWeight: 700 }}>
-            Thermal Horizon Forecasting (Ridge & Random Forest)
+            Thermal Forecasting
           </h2>
           <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
             Multi-step recursive time-series forecasting evaluated on held-out Marconi-100 telemetry partitions.
@@ -145,7 +145,7 @@ export default function ForecastingView() {
           title={`Forecast Accuracy Rate`}
           value={accuracyPct}
           status="OPTIMAL"
-          source={modelInfo?.modelName || 'RandomForest Regressor'}
+          source={modelInfo?.modelName || 'Ridge / GradientBoosting'}
           subtext={`100 - MAPE on held-out test`}
           icon="🎯"
         />
@@ -243,7 +243,7 @@ export default function ForecastingView() {
 
       {/* Model Specification and Detailed Evaluation Table */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '16px' }}>
-        
+
         {/* Model Meta Information */}
         <div
           style={{
@@ -332,7 +332,7 @@ export default function ForecastingView() {
                     return (
                       <tr key={i} style={{ borderBottom: '1px solid rgba(51, 65, 85, 0.35)', color: '#cbd5e1' }}>
                         <td style={{ padding: '8px 10px', fontFamily: 'monospace' }}>
-                          +{ (i + 1) * 5 } min ({f.timestamp ? new Date(f.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Horizon'})
+                          +{(i + 1) * 5} min ({f.timestamp ? new Date(f.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Horizon'})
                         </td>
                         <td style={{ padding: '8px 10px', fontFamily: 'monospace', fontWeight: 600, color: '#38bdf8' }}>
                           {typeof temp === 'number' ? `${temp.toFixed(2)} °C` : 'Unavailable'}

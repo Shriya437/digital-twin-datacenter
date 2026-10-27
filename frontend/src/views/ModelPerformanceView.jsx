@@ -9,26 +9,28 @@ import { useModelMetrics } from '../hooks/useModelMetrics';
  * hyperparameter configurations, and model performance metrics across all pipelines.
  */
 export default function ModelPerformanceView() {
-  const { models, overallPipelineStatus, loading, error, refetch } = useModelMetrics();
+  const { models, evaluationLedger: liveLedger, overallPipelineStatus, loading, error, refetch } = useModelMetrics();
   const [selectedModelId, setSelectedModelId] = useState('regressor');
+
+  const liveRegressor = models?.find((m) => m.id === 'regressor');
 
   // Hard ground-truth specifications for verified model artifacts
   const modelRegistry = [
     {
       id: 'regressor',
-      name: 'Ridge & Random Forest Regressor Ensemble',
+      name: liveRegressor?.name || 'Ridge & GradientBoosting Regressor',
       task: 'Multi-Step Thermal Horizon Forecasting',
-      target: 'temp_core_max',
-      algorithm: 'RandomForestRegressor(n=100) + Ridge(alpha=1.0)',
-      evaluationDataset: 'Marconi-100 Held-Out Temporal Test Split (20%)',
-      metrics: {
-        rmse: '0.82°C',
-        mae: '0.61°C',
-        r2: '0.894',
-        latency: '18ms'
+      target: 'p0_vdd_temp / p1_vdd_temp',
+      algorithm: liveRegressor?.algorithm || 'Ridge(alpha=1.0) + GradientBoostingRegressor(n=100)',
+      evaluationDataset: liveRegressor?.evaluationDataset || 'Marconi-100 Held-Out Temporal Test Split',
+      metrics: liveRegressor?.metrics || {
+        rmse: '1.80°C',
+        mae: '0.86°C',
+        r2: '0.907',
+        latency: '14ms'
       },
       status: 'OPTIMAL',
-      features: ['temp_core_max (t-1..t-4)', 'total_power', 'fan_rpm', 'inlet_temp', 'hour_of_day']
+      features: ['p0_vdd_temp (lags)', 'total_power', 'fan0_0', 'fan1_0', 'ambient']
     },
     {
       id: 'isolation_forest',
@@ -153,15 +155,15 @@ export default function ModelPerformanceView() {
     },
     {
       module: 'predictive_maintenance',
-      model_name: 'RandomForest',
+      model_name: 'Ridge',
       task_type: 'Regression / Forecasting',
       target_variable: 'p0_vdd_temp (1min)',
       condition: 'Observed Telemetry',
-      accuracy_pct: 96.59,
-      mae: 1.2611,
-      rmse: 2.1907,
-      r2_score: 0.863,
-      mape_pct: 3.405,
+      accuracy_pct: 97.57,
+      mae: 0.8593,
+      rmse: 1.8044,
+      r2_score: 0.9071,
+      mape_pct: 2.43,
       precision: '—',
       recall: '—',
       f1_score: '—',
@@ -170,15 +172,15 @@ export default function ModelPerformanceView() {
     },
     {
       module: 'predictive_maintenance',
-      model_name: 'RandomForest',
+      model_name: 'GradientBoosting',
       task_type: 'Regression / Forecasting',
       target_variable: 'p0_vdd_temp (5min)',
       condition: 'Observed Telemetry',
-      accuracy_pct: 89.8,
-      mae: 3.5518,
-      rmse: 5.0868,
-      r2_score: 0.2376,
-      mape_pct: 10.202,
+      accuracy_pct: 90.92,
+      mae: 3.1942,
+      rmse: 4.6837,
+      r2_score: 0.3537,
+      mape_pct: 9.078,
       precision: '—',
       recall: '—',
       f1_score: '—',
@@ -187,15 +189,66 @@ export default function ModelPerformanceView() {
     },
     {
       module: 'predictive_maintenance',
-      model_name: 'HistGradientBoosting',
+      model_name: 'GradientBoosting',
+      task_type: 'Regression / Forecasting',
+      target_variable: 'p0_vdd_temp (15min)',
+      condition: 'Observed Telemetry',
+      accuracy_pct: 85.39,
+      mae: 5.0681,
+      rmse: 6.9219,
+      r2_score: -0.3683,
+      mape_pct: 14.613,
+      precision: '—',
+      recall: '—',
+      f1_score: '—',
+      pr_auc: '—',
+      roc_auc: '—'
+    },
+    {
+      module: 'predictive_maintenance',
+      model_name: 'Ridge',
+      task_type: 'Regression / Forecasting',
+      target_variable: 'p1_vdd_temp (1min)',
+      condition: 'Observed Telemetry',
+      accuracy_pct: 97.70,
+      mae: 0.7713,
+      rmse: 1.6357,
+      r2_score: 0.8957,
+      mape_pct: 2.304,
+      precision: '—',
+      recall: '—',
+      f1_score: '—',
+      pr_auc: '—',
+      roc_auc: '—'
+    },
+    {
+      module: 'predictive_maintenance',
+      model_name: 'Ridge',
+      task_type: 'Regression / Forecasting',
+      target_variable: 'p1_vdd_temp (5min)',
+      condition: 'Observed Telemetry',
+      accuracy_pct: 92.90,
+      mae: 2.3698,
+      rmse: 3.7084,
+      r2_score: 0.4473,
+      mape_pct: 7.103,
+      precision: '—',
+      recall: '—',
+      f1_score: '—',
+      pr_auc: '—',
+      roc_auc: '—'
+    },
+    {
+      module: 'predictive_maintenance',
+      model_name: 'Ridge',
       task_type: 'Regression / Forecasting',
       target_variable: 'p1_vdd_temp (15min)',
       condition: 'Observed Telemetry',
-      accuracy_pct: 85.8,
-      mae: 4.6609,
-      rmse: 6.2365,
-      r2_score: -0.5291,
-      mape_pct: 14.2,
+      accuracy_pct: 87.28,
+      mae: 4.2454,
+      rmse: 5.4281,
+      r2_score: -0.1584,
+      mape_pct: 12.722,
       precision: '—',
       recall: '—',
       f1_score: '—',
@@ -524,7 +577,7 @@ export default function ModelPerformanceView() {
               </tr>
             </thead>
             <tbody>
-              {evaluationLedger.map((row, idx) => (
+              {((liveLedger && liveLedger.length > 0) ? liveLedger : evaluationLedger).map((row, idx) => (
                 <tr key={`${row.model_name}-${row.target_variable}-${idx}`} style={{ color: '#dbeafe', fontSize: '11px' }}>
                   <td style={{ padding: '10px 12px', borderBottom: '1px solid rgba(148, 163, 184, 0.12)' }}>{row.module}</td>
                   <td style={{ padding: '10px 12px', borderBottom: '1px solid rgba(148, 163, 184, 0.12)', fontWeight: 600, color: '#f8fafc' }}>{row.model_name}</td>

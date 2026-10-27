@@ -20,6 +20,60 @@ export default function StatusBadge({ status, label, size = 'sm' }) {
           dot: '#10b981',
           glow: '0 0 8px rgba(16, 185, 129, 0.5)'
         };
+      case 'OBSERVED':
+        return {
+          bg: 'rgba(6, 182, 212, 0.15)',
+          text: '#22d3ee',
+          border: '1px solid rgba(34, 211, 238, 0.35)',
+          dot: '#06b6d4',
+          glow: '0 0 6px rgba(6, 182, 212, 0.4)'
+        };
+      case 'SIMULATED':
+      case 'SYNTHETIC':
+        return {
+          bg: 'rgba(139, 92, 246, 0.15)',
+          text: '#a78bfa',
+          border: '1px solid rgba(167, 139, 250, 0.35)',
+          dot: '#8b5cf6',
+          glow: '0 0 6px rgba(139, 92, 246, 0.4)'
+        };
+      case 'THERMAL_ANOMALY':
+      case 'THERMAL':
+        return {
+          bg: 'rgba(249, 115, 22, 0.15)',
+          text: '#fb923c',
+          border: '1px solid rgba(251, 146, 60, 0.4)',
+          dot: '#f97316',
+          glow: '0 0 8px rgba(249, 115, 22, 0.5)'
+        };
+      case 'FAN_PERFORMANCE_ANOMALY':
+      case 'FAN_ANOMALY':
+      case 'FAN':
+        return {
+          bg: 'rgba(234, 179, 8, 0.15)',
+          text: '#facc15',
+          border: '1px solid rgba(250, 204, 21, 0.4)',
+          dot: '#eab308',
+          glow: '0 0 8px rgba(234, 179, 8, 0.5)'
+        };
+      case 'POWER_ANOMALY':
+      case 'POWER':
+        return {
+          bg: 'rgba(168, 85, 247, 0.15)',
+          text: '#c084fc',
+          border: '1px solid rgba(192, 132, 252, 0.4)',
+          dot: '#a855f7',
+          glow: '0 0 8px rgba(168, 85, 247, 0.5)'
+        };
+      case 'COMBINED_ANOMALY':
+      case 'COMBINED':
+        return {
+          bg: 'rgba(244, 63, 94, 0.18)',
+          text: '#fb7185',
+          border: '1px solid rgba(251, 113, 133, 0.45)',
+          dot: '#f43f5e',
+          glow: '0 0 10px rgba(244, 63, 94, 0.6)'
+        };
       case 'WARNING':
       case 'ELEVATED':
       case 'MAINTENANCE_DUE':

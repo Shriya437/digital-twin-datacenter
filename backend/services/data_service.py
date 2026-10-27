@@ -27,12 +27,16 @@ from backend.config import (
     FORECAST_METRICS_CSV,
     STANDARDIZED_PRED_CSV,
     ANOMALY_RESULTS_CSV,
+    ALL_MODEL_EVALUATION_CSV,
     ENERGY_SUMMARY_CSV,
     CORRELATIONS_CSV,
     CORRELATION_INTERPRETATION_CSV,
     PUE_CSV,
     WHAT_IF_CSV,
     TEMP_DIFFERENCE_CSV,
+    MULTICLASS_PRED_CSV,
+    INTEGRATED_FAULT_JSON,
+    SCENARIO_IMPACT_MATRIX_JSON,
     LATE_THRESHOLD_SECONDS,
     STALE_THRESHOLD_SECONDS,
 )
@@ -81,8 +85,29 @@ def get_asset_graph() -> Dict[str, Any]:
 def get_anomaly_events(limit: Optional[int] = None) -> List[Dict[str, Any]]:
     if "anomaly_events" not in _CACHE:
         if ANOMALY_EVENTS_CSV.exists():
-            df = pd.read_csv(ANOMALY_EVENTS_CSV)
-            _CACHE["anomaly_events"] = sanitize_records(df)
+            df_anom = pd.read_csv(ANOMALY_EVENTS_CSV)
+            if TELEMETRY_CSV.exists():
+                try:
+                    df_tel = pd.read_csv(TELEMETRY_CSV)
+                    df_anom["_ts"] = pd.to_datetime(df_anom["timestamp"], utc=True, errors="coerce")
+                    df_tel["_ts"] = pd.to_datetime(df_tel["timestamp"], utc=True, errors="coerce")
+                    cols = [c for c in ["_ts", "total_power", "p0_vdd_temp", "p1_vdd_temp", "fan0_0", "fan1_0", "ambient", "p0_power", "p1_power"] if c in df_tel.columns]
+                    merged = pd.merge(df_anom, df_tel[cols], on="_ts", how="left").drop(columns=["_ts"])
+                    if "total_power" in merged.columns:
+                        merged["power"] = merged["total_power"]
+                    if "p0_vdd_temp" in merged.columns and "p1_vdd_temp" in merged.columns:
+                        merged["temp_core_max"] = merged[["p0_vdd_temp", "p1_vdd_temp"]].max(axis=1)
+                        merged["temperature"] = merged["p0_vdd_temp"]
+                    elif "p0_vdd_temp" in merged.columns:
+                        merged["temp_core_max"] = merged["p0_vdd_temp"]
+                        merged["temperature"] = merged["p0_vdd_temp"]
+                    if "fan0_0" in merged.columns:
+                        merged["fan_rpm"] = merged["fan0_0"]
+                    _CACHE["anomaly_events"] = sanitize_records(merged)
+                except Exception:
+                    _CACHE["anomaly_events"] = sanitize_records(df_anom)
+            else:
+                _CACHE["anomaly_events"] = sanitize_records(df_anom)
         else:
             _CACHE["anomaly_events"] = []
     events = _CACHE["anomaly_events"]
@@ -109,13 +134,16 @@ def get_predictive_warnings() -> Dict[str, Any]:
     return warnings_data
 
 def get_forecast_metrics() -> List[Dict[str, Any]]:
-    if "forecast_metrics" not in _CACHE:
-        if FORECAST_METRICS_CSV.exists():
-            df = pd.read_csv(FORECAST_METRICS_CSV)
-            _CACHE["forecast_metrics"] = sanitize_records(df)
-        else:
-            _CACHE["forecast_metrics"] = []
-    return _CACHE["forecast_metrics"]
+    if FORECAST_METRICS_CSV.exists():
+        df = pd.read_csv(FORECAST_METRICS_CSV)
+        return sanitize_records(df)
+    return []
+
+def get_all_model_evaluation_metrics() -> List[Dict[str, Any]]:
+    if ALL_MODEL_EVALUATION_CSV.exists():
+        df = pd.read_csv(ALL_MODEL_EVALUATION_CSV)
+        return sanitize_records(df)
+    return []
 
 def get_degradation_indicators(limit: int = 100) -> List[Dict[str, Any]]:
     if DEGRADATION_CSV.exists():
@@ -197,3 +225,44 @@ def get_pue_info() -> Dict[str, Any]:
         "standard_formula": "PUE = Total Facility Power / IT Equipment Power",
         "scope_guidance": "Sub-facility telemetry requires chiller / CRAH metering for compliant PUE."
     }
+
+def get_multiclass_predictions(
+    origin: Optional[str] = None,
+    predicted_class: Optional[str] = None,
+    limit: Optional[int] = 100,
+    offset: int = 0
+) -> Dict[str, Any]:
+    if MULTICLASS_PRED_CSV.exists():
+        df = pd.read_csv(MULTICLASS_PRED_CSV)
+        if origin and origin.lower() != "all":
+            df = df[df["data_origin"].str.lower() == origin.lower()]
+        if predicted_class and predicted_class.lower() != "all":
+            df = df[df["predicted_class"].str.lower() == predicted_class.lower()]
+        total = len(df)
+        subset = df.iloc[offset : offset + limit] if limit else df.iloc[offset:]
+        records = sanitize_records(subset)
+        counts_by_class = {str(k): int(v) for k, v in df["predicted_class"].value_counts().items()}
+        counts_by_origin = {str(k): int(v) for k, v in df["data_origin"].value_counts().items()}
+        return {
+            "total": total,
+            "offset": offset,
+            "limit": limit,
+            "counts_by_class": counts_by_class,
+            "counts_by_origin": counts_by_origin,
+            "records": records
+        }
+    return {
+        "total": 0,
+        "offset": offset,
+        "limit": limit,
+        "counts_by_class": {},
+        "counts_by_origin": {},
+        "records": []
+    }
+
+def get_integrated_fault_workflow() -> Dict[str, Any]:
+    if INTEGRATED_FAULT_JSON.exists():
+        with open(INTEGRATED_FAULT_JSON, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {"generated_scenarios_evaluated": 0, "scenarios": []}
+

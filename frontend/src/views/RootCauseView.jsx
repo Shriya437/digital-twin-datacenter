@@ -17,8 +17,9 @@ export default function RootCauseView() {
   const [diagnosticReport, setDiagnosticReport] = useState(null);
   const [diagLoading, setDiagLoading] = useState(true);
   const [diagError, setDiagError] = useState(null);
+  const [propagationScenarios, setPropagationScenarios] = useState([]);
 
-  // Fetch real diagnostic analysis from backend root-cause endpoint
+  // Fetch real diagnostic analysis and connected propagation scenarios
   useEffect(() => {
     let isMounted = true;
 
@@ -34,11 +35,20 @@ export default function RootCauseView() {
         }
       } catch (err) {
         if (isMounted) {
-          // If the backend has no active incident or endpoint is unpopulated
           setDiagnosticReport(null);
           setDiagLoading(false);
           setDiagError(err.response?.data?.detail || err.message || null);
         }
+      }
+
+      // Fetch 5 connected fault scenarios with distinct injection, classification, propagation
+      try {
+        const scRes = await apiClient.get('/fault-propagation/scenarios');
+        if (isMounted && scRes.data?.scenarios) {
+          setPropagationScenarios(scRes.data.scenarios);
+        }
+      } catch {
+        // Fallback silently if not available
       }
     }
 
@@ -301,6 +311,170 @@ export default function RootCauseView() {
           </div>
         </div>
       </div>
+
+      {/* Connected Fault Scenarios & Graph Blast Radius Matrix */}
+      {propagationScenarios && propagationScenarios.length > 0 && (
+        <div
+          style={{
+            background: 'rgba(15, 23, 42, 0.85)',
+            border: '1px solid rgba(56, 189, 248, 0.18)',
+            borderRadius: '10px',
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+            <div>
+              <span style={{ fontSize: '14px', fontWeight: 700, color: '#f8fafc' }}>
+                Controlled Fault Scenarios & Graph Blast Radius Matrix
+              </span>
+              <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#94a3b8' }}>
+                Integrates <code style={{ color: '#38bdf8' }}>src/fault_scenarios.py</code> and <code style={{ color: '#38bdf8' }}>src/fault_propogation.py</code> with distinct injection, classification, and propagation.
+              </p>
+            </div>
+            <span style={{ fontSize: '11px', color: '#a78bfa', background: 'rgba(139, 92, 246, 0.15)', padding: '3px 8px', borderRadius: '4px', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
+              Strict Domain Separation: Simulation ➔ Inference ➔ Topology
+            </span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '14px' }}>
+            {propagationScenarios.map((sc, sIdx) => {
+              const inj = sc.scenario_injection || {};
+              const clf = sc.classifier_prediction || {};
+              const grp = sc.graph_propagation || {};
+              const predClass = clf.predicted_class || 'unknown';
+
+              return (
+                <div
+                  key={sIdx}
+                  style={{
+                    backgroundColor: 'rgba(30, 41, 59, 0.45)',
+                    border: '1px solid rgba(56, 189, 248, 0.15)',
+                    borderRadius: '8px',
+                    padding: '14px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 700, color: '#f8fafc', fontSize: '13px' }}>
+                      {sc.scenario_id.replace(/_/g, ' ').toUpperCase()}
+                    </span>
+                    <StatusBadge status="SIMULATED" label="SYNTHETIC" size="sm" />
+                  </div>
+
+                  {/* 1. Scenario Injection Domain */}
+                  <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '8px 10px', borderRadius: '6px', fontSize: '11px' }}>
+                    <div style={{ color: '#38bdf8', fontWeight: 600, marginBottom: '2px' }}>
+                      ① Scenario Injection (Simulation Truth)
+                    </div>
+                    <div style={{ color: '#cbd5e1' }}>
+                      Metric: <code style={{ color: '#00f2fe' }}>{inj.affected_metric}</code> | Injected Rows: {inj.injected_row_count}
+                    </div>
+                    <div style={{ color: '#94a3b8', fontSize: '10px' }}>
+                      Expected Cause: {inj.expected_cause?.replace(/_/g, ' ')}
+                    </div>
+                  </div>
+
+                  {/* 2. Classifier Prediction Domain */}
+                  <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '8px 10px', borderRadius: '6px', fontSize: '11px' }}>
+                    <div style={{ color: '#a78bfa', fontWeight: 600, marginBottom: '4px' }}>
+                      ② Classifier Prediction ({clf.model_name || 'RandomForest'})
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      <StatusBadge status={predClass.toUpperCase()} label={predClass.replace(/_/g, ' ')} size="sm" />
+                      <span style={{ color: '#94a3b8', fontFamily: 'monospace' }}>
+                        Confidence: {typeof clf.confidence === 'number' ? (clf.confidence * 100).toFixed(1) + '%' : '—'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 3. Graph Propagation Domain */}
+                  <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '10px', borderRadius: '6px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <div style={{ color: '#34d399', fontWeight: 600 }}>
+                        ③ Graph Cascading & Blast Radius
+                      </div>
+                      <span style={{ fontSize: '10px', background: 'rgba(52, 211, 153, 0.15)', color: '#34d399', padding: '2px 6px', borderRadius: '4px', border: '1px solid rgba(52, 211, 153, 0.3)' }}>
+                        ✓ Asset Graph Referenced
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: '#cbd5e1' }}>
+                      <span>Source: <code style={{ color: '#00f2fe' }}>{grp.source_asset_id?.split('::')[1] || grp.source_asset_id}</code></span>
+                      <span style={{ color: '#94a3b8' }}>
+                        Blast Radius: <strong style={{ color: '#34d399' }}>{grp.reachable_asset_count || 1} assets</strong> (Depth {grp.max_impact_depth || 0})
+                      </span>
+                    </div>
+
+                    {/* Cascading Path Breadcrumb */}
+                    {grp.cascading_path && (
+                      <div style={{ background: 'rgba(0, 0, 0, 0.25)', padding: '6px 8px', borderRadius: '4px', borderLeft: '2px solid #34d399' }}>
+                        <div style={{ color: '#94a3b8', fontSize: '10px', marginBottom: '2px' }}>Cascading Propagation Path:</div>
+                        <div style={{ color: '#e2e8f0', fontSize: '10.5px', fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                          {grp.cascading_path}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Cascade Stages Timeline */}
+                    {grp.cascade_stages && grp.cascade_stages.length > 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '2px' }}>
+                        <div style={{ color: '#94a3b8', fontSize: '10px' }}>Cascading Stages Breakdown:</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '6px' }}>
+                          {grp.cascade_stages.map((stg, stgIdx) => (
+                            <div
+                              key={stgIdx}
+                              style={{
+                                background: 'rgba(30, 41, 59, 0.6)',
+                                border: '1px solid rgba(56, 189, 248, 0.15)',
+                                borderRadius: '4px',
+                                padding: '5px 7px',
+                                fontSize: '10px'
+                              }}
+                            >
+                              <div style={{ color: stg.stage === 0 ? '#f43f5e' : stg.stage === 1 ? '#38bdf8' : stg.stage === 2 ? '#fbbf24' : '#a78bfa', fontWeight: 600 }}>
+                                {stg.stage_label}
+                              </div>
+                              <div style={{ color: '#94a3b8', fontSize: '9px', margin: '2px 0 4px 0', lineHeight: 1.2 }}>
+                                {stg.description}
+                              </div>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
+                                {stg.assets?.map((aId, aIdx) => (
+                                  <span
+                                    key={aIdx}
+                                    style={{
+                                      background: 'rgba(15, 23, 42, 0.8)',
+                                      color: '#e2e8f0',
+                                      padding: '1px 4px',
+                                      borderRadius: '3px',
+                                      fontSize: '9px',
+                                      fontFamily: 'monospace'
+                                    }}
+                                  >
+                                    {aId.split('::')[1] || aId}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div style={{ color: '#94a3b8', fontSize: '10px', marginTop: '2px', fontStyle: 'italic' }}>
+                      {grp.safeguard_warning}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
