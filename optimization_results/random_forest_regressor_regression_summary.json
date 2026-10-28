@@ -1,0 +1,76 @@
+{
+  "model": "random_forest_regressor",
+  "task": "regression",
+  "n_trials": 30,
+  "best_validation_score": 4.559163805510357,
+  "optimization_direction": "minimize",
+  "best_params": {
+    "n_estimators": 200,
+    "max_depth": 5,
+    "min_samples_split": 13,
+    "min_samples_leaf": 4,
+    "max_features": "log2"
+  },
+  "baseline_test_metrics": {
+    "MAE": 5.551639434783966,
+    "RMSE": 7.2255491395249125,
+    "R2": -0.49101853408205276,
+    "target": "p0_vdd_temp",
+    "horizon_steps": 45,
+    "approx_horizon_minutes": 15.0
+  },
+  "optimized_test_metrics": {
+    "MAE": 5.289320623976629,
+    "RMSE": 6.846044178965975,
+    "R2": -0.3385072224090895,
+    "target": "p0_vdd_temp",
+    "horizon_steps": 45,
+    "approx_horizon_minutes": 15.0
+  },
+  "before_after_comparison": {
+    "model": "random_forest_regressor",
+    "task": "regression",
+    "primary_metric": "RMSE",
+    "optimization_direction": "lower_is_better",
+    "baseline_primary_score": 7.2255491395249125,
+    "optimized_primary_score": 6.846044178965975,
+    "improved": true,
+    "improvement_absolute": 0.3795049605589371,
+    "improvement_percent_of_baseline": 5.2522646131210164,
+    "metrics": {
+      "MAE": {
+        "before": 5.551639434783966,
+        "after": 5.289320623976629,
+        "change_after_minus_before": -0.2623188108073373
+      },
+      "RMSE": {
+        "before": 7.2255491395249125,
+        "after": 6.846044178965975,
+        "change_after_minus_before": -0.3795049605589371
+      },
+      "R2": {
+        "before": -0.49101853408205276,
+        "after": -0.3385072224090895,
+        "change_after_minus_before": 0.15251131167296328
+      }
+    },
+    "baseline_test_metrics": {
+      "MAE": 5.551639434783966,
+      "RMSE": 7.2255491395249125,
+      "R2": -0.49101853408205276,
+      "target": "p0_vdd_temp",
+      "horizon_steps": 45,
+      "approx_horizon_minutes": 15.0
+    },
+    "optimized_test_metrics": {
+      "MAE": 5.289320623976629,
+      "RMSE": 6.846044178965975,
+      "R2": -0.3385072224090895,
+      "target": "p0_vdd_temp",
+      "horizon_steps": 45,
+      "approx_horizon_minutes": 15.0
+    },
+    "comparison_note": "Both versions use the same train+validation fit rows and the same held-out test rows."
+  },
+  "output_directory": "C:\\Users\\anand\\Downloads\\digital-twin-member2-starter\\digital-twin-member2-starter\\optimization_results"
+}

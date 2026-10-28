@@ -1,0 +1,51 @@
+{
+  "accuracy": 0.8024096385542169,
+  "macro_f1": 0.6992554249486327,
+  "classification_report": {
+    "combined_anomaly": {
+      "precision": 0.6484375,
+      "recall": 0.3155893536121673,
+      "f1-score": 0.42455242966751916,
+      "support": 263.0
+    },
+    "fan_performance_anomaly": {
+      "precision": 0.8324514991181657,
+      "recall": 0.8613138686131386,
+      "f1-score": 0.8466367713004485,
+      "support": 548.0
+    },
+    "normal": {
+      "precision": 0.8978433598183881,
+      "recall": 0.8673245614035088,
+      "f1-score": 0.8823201338538762,
+      "support": 1824.0
+    },
+    "power_anomaly": {
+      "precision": 0.6211453744493393,
+      "recall": 0.6811594202898551,
+      "f1-score": 0.6497695852534562,
+      "support": 207.0
+    },
+    "thermal_anomaly": {
+      "precision": 0.6069182389937107,
+      "recall": 0.8075313807531381,
+      "f1-score": 0.6929982046678635,
+      "support": 478.0
+    },
+    "accuracy": 0.8024096385542169,
+    "macro avg": {
+      "precision": 0.7213591944759207,
+      "recall": 0.7065837169343615,
+      "f1-score": 0.6992554249486327,
+      "support": 3320.0
+    },
+    "weighted avg": {
+      "precision": 0.8081544527335849,
+      "recall": 0.8024096385542169,
+      "f1-score": 0.7984101234347524,
+      "support": 3320.0
+    }
+  },
+  "dataset": "synthetic",
+  "classification_task": "multiclass"
+}

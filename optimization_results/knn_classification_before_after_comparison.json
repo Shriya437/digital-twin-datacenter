@@ -1,0 +1,126 @@
+{
+  "model": "knn",
+  "task": "classification",
+  "primary_metric": "macro_f1",
+  "optimization_direction": "higher_is_better",
+  "baseline_primary_score": 0.44837615476212644,
+  "optimized_primary_score": 0.5185950741588471,
+  "improved": true,
+  "improvement_absolute": 0.07021891939672065,
+  "improvement_percent_of_baseline": 15.660716710944039,
+  "metrics": {
+    "accuracy": {
+      "before": 0.6397590361445783,
+      "after": 0.7072289156626506,
+      "change_after_minus_before": 0.06746987951807226
+    },
+    "macro_f1": {
+      "before": 0.44837615476212644,
+      "after": 0.5185950741588471,
+      "change_after_minus_before": 0.07021891939672065
+    }
+  },
+  "baseline_test_metrics": {
+    "accuracy": 0.6397590361445783,
+    "macro_f1": 0.44837615476212644,
+    "classification_report": {
+      "combined_anomaly": {
+        "precision": 0.6206896551724138,
+        "recall": 0.06844106463878327,
+        "f1-score": 0.1232876712328767,
+        "support": 263.0
+      },
+      "fan_performance_anomaly": {
+        "precision": 0.4868421052631579,
+        "recall": 0.4726277372262774,
+        "f1-score": 0.47962962962962963,
+        "support": 548.0
+      },
+      "normal": {
+        "precision": 0.6666666666666666,
+        "recall": 0.8837719298245614,
+        "f1-score": 0.76001885902876,
+        "support": 1824.0
+      },
+      "power_anomaly": {
+        "precision": 0.7125,
+        "recall": 0.2753623188405797,
+        "f1-score": 0.397212543554007,
+        "support": 207.0
+      },
+      "thermal_anomaly": {
+        "precision": 0.6819923371647509,
+        "recall": 0.3723849372384937,
+        "f1-score": 0.4817320703653586,
+        "support": 478.0
+      },
+      "accuracy": 0.6397590361445783,
+      "macro avg": {
+        "precision": 0.6337381528533979,
+        "recall": 0.4145175975537391,
+        "f1-score": 0.44837615476212644,
+        "support": 3320.0
+      },
+      "weighted avg": {
+        "precision": 0.6384068343853332,
+        "recall": 0.6397590361445783,
+        "f1-score": 0.600610548069296,
+        "support": 3320.0
+      }
+    },
+    "dataset": "synthetic",
+    "classification_task": "multiclass"
+  },
+  "optimized_test_metrics": {
+    "accuracy": 0.7072289156626506,
+    "macro_f1": 0.5185950741588471,
+    "classification_report": {
+      "combined_anomaly": {
+        "precision": 0.9032258064516129,
+        "recall": 0.10646387832699619,
+        "f1-score": 0.19047619047619047,
+        "support": 263.0
+      },
+      "fan_performance_anomaly": {
+        "precision": 0.6928571428571428,
+        "recall": 0.531021897810219,
+        "f1-score": 0.6012396694214877,
+        "support": 548.0
+      },
+      "normal": {
+        "precision": 0.7065040650406504,
+        "recall": 0.9528508771929824,
+        "f1-score": 0.811391223155929,
+        "support": 1824.0
+      },
+      "power_anomaly": {
+        "precision": 0.7866666666666666,
+        "recall": 0.28502415458937197,
+        "f1-score": 0.41843971631205673,
+        "support": 207.0
+      },
+      "thermal_anomaly": {
+        "precision": 0.6946107784431138,
+        "recall": 0.48535564853556484,
+        "f1-score": 0.5714285714285714,
+        "support": 478.0
+      },
+      "accuracy": 0.7072289156626506,
+      "macro avg": {
+        "precision": 0.7567728918918373,
+        "recall": 0.47214329129102695,
+        "f1-score": 0.5185950741588471,
+        "support": 3320.0
+      },
+      "weighted avg": {
+        "precision": 0.723120924130254,
+        "recall": 0.7072289156626506,
+        "f1-score": 0.6684674838536389,
+        "support": 3320.0
+      }
+    },
+    "dataset": "synthetic",
+    "classification_task": "multiclass"
+  },
+  "comparison_note": "Both versions use the same train+validation fit rows and the same held-out test rows."
+}

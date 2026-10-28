@@ -1,0 +1,6 @@
+{
+  "n_neighbors": 5,
+  "weights": "uniform",
+  "p": 1,
+  "leaf_size": 57
+}

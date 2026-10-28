@@ -762,7 +762,7 @@ def run_forecast(
     candidate_results.append(
         {
             "name": "Persistence",
-            "validation_MAE": persistence_metrics["MAE"],
+            "validation_RMSE": persistence_metrics["RMSE"],
         }
     )
 

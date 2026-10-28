@@ -1,0 +1,45 @@
+{
+  "model": "ridge_regressor",
+  "task": "regression",
+  "primary_metric": "RMSE",
+  "optimization_direction": "lower_is_better",
+  "baseline_primary_score": 6.328564601153623,
+  "optimized_primary_score": 6.316743954523098,
+  "improved": true,
+  "improvement_absolute": 0.011820646630525289,
+  "improvement_percent_of_baseline": 0.1867824281728992,
+  "metrics": {
+    "MAE": {
+      "before": 4.832838166026902,
+      "after": 4.8194249192134455,
+      "change_after_minus_before": -0.01341324681345668
+    },
+    "RMSE": {
+      "before": 6.328564601153623,
+      "after": 6.316743954523098,
+      "change_after_minus_before": -0.011820646630525289
+    },
+    "R2": {
+      "before": -0.14380439108478016,
+      "after": -0.13953553032198762,
+      "change_after_minus_before": 0.004268860762792537
+    }
+  },
+  "baseline_test_metrics": {
+    "MAE": 4.832838166026902,
+    "RMSE": 6.328564601153623,
+    "R2": -0.14380439108478016,
+    "target": "p0_vdd_temp",
+    "horizon_steps": 45,
+    "approx_horizon_minutes": 15.0
+  },
+  "optimized_test_metrics": {
+    "MAE": 4.8194249192134455,
+    "RMSE": 6.316743954523098,
+    "R2": -0.13953553032198762,
+    "target": "p0_vdd_temp",
+    "horizon_steps": 45,
+    "approx_horizon_minutes": 15.0
+  },
+  "comparison_note": "Both versions use the same train+validation fit rows and the same held-out test rows."
+}

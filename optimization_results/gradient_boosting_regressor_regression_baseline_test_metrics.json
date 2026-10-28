@@ -1,0 +1,8 @@
+{
+  "MAE": 5.20435852468378,
+  "RMSE": 6.663088162118381,
+  "R2": -0.267921725407291,
+  "target": "p0_vdd_temp",
+  "horizon_steps": 45,
+  "approx_horizon_minutes": 15.0
+}

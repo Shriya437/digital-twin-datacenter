@@ -1,0 +1,8 @@
+{
+  "n_estimators": 300,
+  "learning_rate": 0.017080276510393195,
+  "max_depth": 1,
+  "min_samples_leaf": 15,
+  "subsample": 0.7194384181306676,
+  "loss": "huber"
+}

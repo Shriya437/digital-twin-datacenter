@@ -1,0 +1,76 @@
+{
+  "model": "hist_gradient_boosting_regressor",
+  "task": "regression",
+  "n_trials": 30,
+  "best_validation_score": 4.789314419164626,
+  "optimization_direction": "minimize",
+  "best_params": {
+    "learning_rate": 0.020405828422603103,
+    "max_iter": 80,
+    "max_leaf_nodes": 21,
+    "l2_regularization": 0.007193482986555141,
+    "min_samples_leaf": 13
+  },
+  "baseline_test_metrics": {
+    "MAE": 5.381246224455485,
+    "RMSE": 7.309624002725321,
+    "R2": -0.5259187169765582,
+    "target": "p0_vdd_temp",
+    "horizon_steps": 45,
+    "approx_horizon_minutes": 15.0
+  },
+  "optimized_test_metrics": {
+    "MAE": 5.244935171070001,
+    "RMSE": 6.764084005937129,
+    "R2": -0.30665011012402554,
+    "target": "p0_vdd_temp",
+    "horizon_steps": 45,
+    "approx_horizon_minutes": 15.0
+  },
+  "before_after_comparison": {
+    "model": "hist_gradient_boosting_regressor",
+    "task": "regression",
+    "primary_metric": "RMSE",
+    "optimization_direction": "lower_is_better",
+    "baseline_primary_score": 7.309624002725321,
+    "optimized_primary_score": 6.764084005937129,
+    "improved": true,
+    "improvement_absolute": 0.5455399967881913,
+    "improvement_percent_of_baseline": 7.46331133564178,
+    "metrics": {
+      "MAE": {
+        "before": 5.381246224455485,
+        "after": 5.244935171070001,
+        "change_after_minus_before": -0.13631105338548455
+      },
+      "RMSE": {
+        "before": 7.309624002725321,
+        "after": 6.764084005937129,
+        "change_after_minus_before": -0.5455399967881913
+      },
+      "R2": {
+        "before": -0.5259187169765582,
+        "after": -0.30665011012402554,
+        "change_after_minus_before": 0.2192686068525327
+      }
+    },
+    "baseline_test_metrics": {
+      "MAE": 5.381246224455485,
+      "RMSE": 7.309624002725321,
+      "R2": -0.5259187169765582,
+      "target": "p0_vdd_temp",
+      "horizon_steps": 45,
+      "approx_horizon_minutes": 15.0
+    },
+    "optimized_test_metrics": {
+      "MAE": 5.244935171070001,
+      "RMSE": 6.764084005937129,
+      "R2": -0.30665011012402554,
+      "target": "p0_vdd_temp",
+      "horizon_steps": 45,
+      "approx_horizon_minutes": 15.0
+    },
+    "comparison_note": "Both versions use the same train+validation fit rows and the same held-out test rows."
+  },
+  "output_directory": "C:\\Users\\anand\\Downloads\\digital-twin-member2-starter\\digital-twin-member2-starter\\optimization_results"
+}

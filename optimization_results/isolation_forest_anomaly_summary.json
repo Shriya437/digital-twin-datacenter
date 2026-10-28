@@ -1,0 +1,171 @@
+{
+  "model": "isolation_forest",
+  "task": "anomaly",
+  "n_trials": 30,
+  "best_validation_score": 0.6813137361640356,
+  "optimization_direction": "maximize",
+  "best_params": {
+    "n_estimators": 200,
+    "max_samples": 1.0,
+    "contamination": 0.19338273416486318,
+    "max_features": 0.6593302841061144,
+    "bootstrap": true
+  },
+  "baseline_test_metrics": {
+    "accuracy": 0.5030120481927711,
+    "macro_f1": 0.45807790382396374,
+    "classification_report": {
+      "0": {
+        "precision": 0.5354812398042414,
+        "recall": 0.7198464912280702,
+        "f1-score": 0.6141253507951356,
+        "support": 1824.0
+      },
+      "1": {
+        "precision": 0.4112903225806452,
+        "recall": 0.23863636363636365,
+        "f1-score": 0.3020304568527919,
+        "support": 1496.0
+      },
+      "accuracy": 0.5030120481927711,
+      "macro avg": {
+        "precision": 0.47338578119244334,
+        "recall": 0.4792414274322169,
+        "f1-score": 0.45807790382396374,
+        "support": 3320.0
+      },
+      "weighted avg": {
+        "precision": 0.4795205132480668,
+        "recall": 0.5030120481927711,
+        "f1-score": 0.47349463954882653,
+        "support": 3320.0
+      }
+    },
+    "dataset": "synthetic",
+    "classification_task": "binary"
+  },
+  "optimized_test_metrics": {
+    "accuracy": 0.577710843373494,
+    "macro_f1": 0.5632556121537489,
+    "classification_report": {
+      "0": {
+        "precision": 0.6004761904761905,
+        "recall": 0.6913377192982456,
+        "f1-score": 0.6427115188583078,
+        "support": 1824.0
+      },
+      "1": {
+        "precision": 0.5385245901639344,
+        "recall": 0.4391711229946524,
+        "f1-score": 0.48379970544919,
+        "support": 1496.0
+      },
+      "accuracy": 0.577710843373494,
+      "macro avg": {
+        "precision": 0.5695003903200624,
+        "recall": 0.565254421146449,
+        "f1-score": 0.5632556121537489,
+        "support": 3320.0
+      },
+      "weighted avg": {
+        "precision": 0.5725606500945233,
+        "recall": 0.577710843373494,
+        "f1-score": 0.571105472816127,
+        "support": 3320.0
+      }
+    },
+    "dataset": "synthetic",
+    "classification_task": "binary"
+  },
+  "before_after_comparison": {
+    "model": "isolation_forest",
+    "task": "anomaly",
+    "primary_metric": "macro_f1",
+    "optimization_direction": "higher_is_better",
+    "baseline_primary_score": 0.45807790382396374,
+    "optimized_primary_score": 0.5632556121537489,
+    "improved": true,
+    "improvement_absolute": 0.10517770832978512,
+    "improvement_percent_of_baseline": 22.96065962836841,
+    "metrics": {
+      "accuracy": {
+        "before": 0.5030120481927711,
+        "after": 0.577710843373494,
+        "change_after_minus_before": 0.07469879518072287
+      },
+      "macro_f1": {
+        "before": 0.45807790382396374,
+        "after": 0.5632556121537489,
+        "change_after_minus_before": 0.10517770832978512
+      }
+    },
+    "baseline_test_metrics": {
+      "accuracy": 0.5030120481927711,
+      "macro_f1": 0.45807790382396374,
+      "classification_report": {
+        "0": {
+          "precision": 0.5354812398042414,
+          "recall": 0.7198464912280702,
+          "f1-score": 0.6141253507951356,
+          "support": 1824.0
+        },
+        "1": {
+          "precision": 0.4112903225806452,
+          "recall": 0.23863636363636365,
+          "f1-score": 0.3020304568527919,
+          "support": 1496.0
+        },
+        "accuracy": 0.5030120481927711,
+        "macro avg": {
+          "precision": 0.47338578119244334,
+          "recall": 0.4792414274322169,
+          "f1-score": 0.45807790382396374,
+          "support": 3320.0
+        },
+        "weighted avg": {
+          "precision": 0.4795205132480668,
+          "recall": 0.5030120481927711,
+          "f1-score": 0.47349463954882653,
+          "support": 3320.0
+        }
+      },
+      "dataset": "synthetic",
+      "classification_task": "binary"
+    },
+    "optimized_test_metrics": {
+      "accuracy": 0.577710843373494,
+      "macro_f1": 0.5632556121537489,
+      "classification_report": {
+        "0": {
+          "precision": 0.6004761904761905,
+          "recall": 0.6913377192982456,
+          "f1-score": 0.6427115188583078,
+          "support": 1824.0
+        },
+        "1": {
+          "precision": 0.5385245901639344,
+          "recall": 0.4391711229946524,
+          "f1-score": 0.48379970544919,
+          "support": 1496.0
+        },
+        "accuracy": 0.577710843373494,
+        "macro avg": {
+          "precision": 0.5695003903200624,
+          "recall": 0.565254421146449,
+          "f1-score": 0.5632556121537489,
+          "support": 3320.0
+        },
+        "weighted avg": {
+          "precision": 0.5725606500945233,
+          "recall": 0.577710843373494,
+          "f1-score": 0.571105472816127,
+          "support": 3320.0
+        }
+      },
+      "dataset": "synthetic",
+      "classification_task": "binary"
+    },
+    "comparison_note": "Both versions use the same train+validation fit rows and the same held-out test rows."
+  },
+  "output_directory": "C:\\Users\\anand\\Downloads\\digital-twin-member2-starter\\digital-twin-member2-starter\\optimization_results"
+}
